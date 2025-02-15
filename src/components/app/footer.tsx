@@ -7,7 +7,7 @@ export default function AppFooter({ className }: { className?: string }) {
         ${className}
       `}
     >
-      &copy; 2024 Design by NKUST ISLab
+      &copy; 2024 Design by ExpTech Studio
     </footer>
   );
 }
