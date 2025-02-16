@@ -47,7 +47,9 @@ function Clock() {
       try {
         const response = await fetch(`https://api-1.exptech.dev/api/v2/weather/realtime/${searchParams.get('region') || '711'}`);
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        const data: WeatherData = await response.json();
+
+        const data = (await response.json()) as WeatherData;
+
         setWeatherData(data);
       }
       catch (error) {

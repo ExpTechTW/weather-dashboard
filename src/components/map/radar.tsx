@@ -22,7 +22,8 @@ function RadarMap() {
         const response = await fetch(RADAR_API);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-        const timeList: string[] = await response.json();
+        const timeList = (await response.json()) as string[];
+
         setRadarTimes(timeList.slice(-6 * Number(searchParams.get('radar-dispaly-hours') || '1')));
       }
       catch (error) {
