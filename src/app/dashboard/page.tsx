@@ -16,8 +16,8 @@ export default function DashBoard() {
       <Suspense fallback={<div>Loading...</div>}>
         <div className="flex h-screen w-screen overflow-hidden bg-gray-900">
           <div className={`
-            flex min-w-[280px] max-w-[320px] flex-col space-y-4 p-4
-            lg:w-96 lg:space-y-6 lg:p-6
+            flex min-w-[320px] max-w-[360px] flex-col space-y-2 p-2
+            lg:min-w-[400px] lg:max-w-[440px] lg:space-y-4 lg:p-4
           `}
           >
             <div className="relative">

@@ -79,51 +79,52 @@ function Clock() {
 
   const WeatherIcon = weatherData ? getWeatherIcon(weatherData.weather.code, weatherData.weather.is_day) : Cloud;
 
-  // src/components/clock.tsx
   return (
     <div className={`
-      mx-auto w-full rounded-lg border border-gray-700 bg-gray-900 p-3 text-xs
+      mx-auto w-full rounded-lg border border-gray-700 bg-gray-900 p-2 text-xs
       text-gray-300 shadow-lg
       lg:max-w-xs lg:p-4 lg:text-sm
     `}
     >
-      <div className="flex items-center justify-between">
-        <span>{new Date().toLocaleDateString('zh-TW', { month: 'long', day: 'numeric', weekday: 'short' })}</span>
+      <div className={`
+        flex items-center justify-between text-xs
+        lg:text-sm
+      `}
+      >
+        <span className="truncate">{new Date().toLocaleDateString('zh-TW', { month: 'long', day: 'numeric', weekday: 'short' })}</span>
         {weatherData && (
-          <span>
+          <span className="truncate pl-2">
             {weatherData.weather.station.county}
             {' '}
             {weatherData.weather.station.town}
           </span>
         )}
       </div>
+
       {weatherData && (
         <div className={`
           mt-1.5 flex items-center justify-between
           lg:mt-2
         `}
         >
-          <div className={`
-            flex flex-col items-center text-sm
-            lg:text-base
-          `}
-          >
+          <div className="flex flex-col items-center justify-center space-y-1">
             <WeatherIcon className={`
               h-8 w-8 text-blue-400
               lg:h-12 lg:w-12
             `}
             />
             <span className={`
-              text-base font-medium
-              lg:text-lg
+              text-center text-xs font-medium
+              lg:text-base
             `}
             >
               {weatherData.weather.data.weather}
             </span>
           </div>
-          <div className="flex flex-col items-center">
+
+          <div className="flex flex-col items-center justify-center">
             <span className={`
-              text-lg font-bold text-red-400
+              text-base font-bold text-red-400
               lg:text-xl
             `}
             >
@@ -131,7 +132,7 @@ function Clock() {
               °C
             </span>
             <span className={`
-              text-sm font-bold text-blue-400
+              text-xs font-bold text-blue-400
               lg:text-base
             `}
             >
@@ -139,9 +140,10 @@ function Clock() {
               °C
             </span>
           </div>
+
           <div className={`
-            text-3xl font-extrabold text-cyan-400
-            lg:text-4xl
+            text-2xl font-extrabold text-cyan-400
+            lg:text-3xl
           `}
           >
             {weatherData.weather.data.air.temperature.toFixed(1)}
@@ -149,9 +151,10 @@ function Clock() {
           </div>
         </div>
       )}
+
       <div className={`
-        mt-1.5 flex justify-between text-sm
-        lg:mt-2 lg:text-base
+        mt-1.5 flex justify-between text-xs
+        lg:mt-2 lg:text-sm
       `}
       >
         <div className="flex items-center gap-1">
@@ -160,8 +163,9 @@ function Clock() {
             lg:h-4 lg:w-4
           `}
           />
-          <span>
+          <span className="whitespace-nowrap">
             濕度:
+            {' '}
             {weatherData?.weather.data.air.relative_humidity}
             %
           </span>
@@ -172,16 +176,18 @@ function Clock() {
             lg:h-4 lg:w-4
           `}
           />
-          <span>
+          <span className="whitespace-nowrap">
             風速:
+            {' '}
             {weatherData?.weather.data.wind.speed.toFixed(1)}
             {' '}
             m/s
           </span>
         </div>
       </div>
+
       <div className={`
-        mt-1.5 text-center text-4xl font-bold tracking-wider text-white
+        mt-1.5 text-center text-3xl font-bold tracking-wider text-white
         lg:mt-2 lg:text-6xl
       `}
       >
