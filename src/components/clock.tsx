@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Cloud, CloudDrizzle, CloudFog, CloudLightning, CloudMoon, CloudRain, CloudSnow, CloudSun, Cloudy, Droplet, Moon, Snowflake, Sun, Wind } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 
 import type { LucideIcon } from 'lucide-react';
 
@@ -21,6 +22,7 @@ interface WeatherData {
 }
 
 function Clock() {
+  const searchParams = useSearchParams();
   const [time, setTime] = useState<string>('');
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
 
@@ -43,7 +45,7 @@ function Clock() {
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        const response = await fetch('https://api-1.exptech.dev/api/v2/weather/realtime/711');
+        const response = await fetch(`https://api-1.exptech.dev/api/v2/weather/realtime/${searchParams.get('region') || '711'}`);
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data: WeatherData = await response.json();
         setWeatherData(data);

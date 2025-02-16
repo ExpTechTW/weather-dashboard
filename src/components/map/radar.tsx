@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Map, RasterTileSource } from 'maplibre-gl';
 import { Clock, Cloud } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 
 import { BaseMap } from '@/components/map/base';
 
@@ -10,6 +11,7 @@ const RADAR_API = 'https://api.exptech.dev/api/v1/tiles/radar/list';
 const TILE_URL = 'https://api-1.exptech.dev/api/v1/tiles/radar';
 
 function RadarMap() {
+  const searchParams = useSearchParams();
   const [radarTimes, setRadarTimes] = useState<string[]>([]);
   const [currentFrame, setCurrentFrame] = useState(0);
   const [map, setMap] = useState<Map | null>(null);
@@ -21,7 +23,7 @@ function RadarMap() {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
         const timeList: string[] = await response.json();
-        setRadarTimes(timeList.slice(-12));
+        setRadarTimes(timeList.slice(-6 * Number(searchParams.get('radar-dispaly-hours') || '1')));
       }
       catch (error) {
         console.error('Error fetching radar times:', error instanceof Error ? error.message : error);
