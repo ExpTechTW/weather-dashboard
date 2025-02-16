@@ -1,16 +1,16 @@
-FROM node:lts-alpine AS builder
+FROM oven/bun:1.1.42-alpine AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci
+RUN bun i
 
 COPY . .
 
-RUN npm run build
+RUN bun run build
 
-FROM node:lts-alpine AS runner
+FROM oven/bun:1.1.42-alpine AS runner
 
 WORKDIR /app
 
@@ -20,4 +20,4 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-CMD ["node", "server.js"]
+CMD ["bun", "server.js"]
