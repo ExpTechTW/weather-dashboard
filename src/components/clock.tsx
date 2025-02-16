@@ -54,7 +54,7 @@ function Clock() {
     };
 
     void fetchWeather();
-    const weatherTimer = setInterval(() => void fetchWeather(), 300000);
+    const weatherTimer = setInterval(() => void fetchWeather(), 60000);
     return () => clearInterval(weatherTimer);
   }, []);
 

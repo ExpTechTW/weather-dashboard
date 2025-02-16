@@ -4,8 +4,9 @@ import { useEffect, useRef } from 'react';
 import { Map } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-function MapComponent() {
+export function BaseMap({ onMapLoaded }: { onMapLoaded?: (map: Map) => void }) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<Map | null>(null);
 
   useEffect(() => {
     if (mapContainerRef.current === null) return;
@@ -27,58 +28,21 @@ function MapComponent() {
           {
             id: 'background',
             type: 'background',
-            paint: {
-              'background-color': '#1f2025',
-            },
+            paint: { 'background-color': '#1f2025' },
           },
           {
             'id': 'county',
             'type': 'fill',
             'source': 'map',
             'source-layer': 'city',
-            'paint': {
-              'fill-color': '#3F4045',
-              'fill-opacity': 1,
-            },
-          },
-          {
-            'id': 'town',
-            'type': 'fill',
-            'source': 'map',
-            'source-layer': 'town',
-            'paint': {
-              'fill-color': '#3F4045',
-              'fill-opacity': 1,
-            },
+            'paint': { 'fill-color': '#3F4045', 'fill-opacity': 1 },
           },
           {
             'id': 'county-outline',
+            'type': 'line',
             'source': 'map',
             'source-layer': 'city',
-            'type': 'line',
-            'paint': {
-              'line-color': '#a9b4bc',
-            },
-          },
-          {
-            'id': 'global',
-            'type': 'fill',
-            'source': 'map',
-            'source-layer': 'global',
-            'paint': {
-              'fill-color': '#3F4045',
-              'fill-opacity': 1,
-            },
-          },
-          {
-            'id': 'tsunami',
-            'type': 'line',
-            'source': 'map',
-            'source-layer': 'tsunami',
-            'paint': {
-              'line-opacity': 0,
-              'line-width': 3,
-            },
+            'paint': { 'line-color': '#a9b4bc' },
           },
         ],
       },
@@ -91,12 +55,15 @@ function MapComponent() {
       minZoom: 4,
     });
 
+    mapRef.current = map;
+
+    // 如果有提供 onMapLoaded 回調，則傳遞地圖對象
+    if (onMapLoaded) onMapLoaded(map);
+
     map.on('error', () => void 0);
 
     return () => map.remove();
-  }, []);
+  }, [onMapLoaded]);
 
   return <div ref={mapContainerRef} className="h-full w-full" />;
 }
-
-export default MapComponent;
