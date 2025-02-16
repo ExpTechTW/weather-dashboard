@@ -13,7 +13,7 @@ const Clock: React.FC = () => {
 
   return (
     <div
-      className="flex flex-col items-center gap-1 p-2"
+      className="flex flex-col items-center gap-1 p-2 text-white"
     >
       <div className="text-6xl font-black">
         {time(t)}

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { ArrowUp, Cloud, CloudDrizzle, CloudFog, CloudLightning, CloudMoon, CloudRain, CloudSnow, CloudSun, Cloudy, Droplet, Moon, Snowflake, Sun, Thermometer } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
-import moment from 'moment';
+
+import pkg from '../../../../package.json';
 
 import type { FC } from 'react';
 import type { LucideIcon } from 'lucide-react';
-
 interface WeatherData {
   weather: {
     code: number;
@@ -78,8 +78,6 @@ const WeatherCard: FC = () => {
 
   const WeatherIcon = weatherData ? getWeatherIcon(weatherData.weather.code, weatherData.weather.is_day) : Cloud;
 
-  const dateStr = moment().format('MM/DD (dd)');
-
   return (
     <div className={`
       flex flex-col gap-4 overflow-hidden rounded-lg border border-gray-700
@@ -92,7 +90,10 @@ const WeatherCard: FC = () => {
         sm:text-sm
       `}
       >
-        <span className="truncate pl-2">{dateStr}</span>
+        <span className="truncate pl-2">
+          v
+          {pkg.version}
+        </span>
         {weatherData && (
           <span className="truncate">
             {weatherData.weather.station.county}
@@ -102,22 +103,22 @@ const WeatherCard: FC = () => {
       </div>
 
       {weatherData && (
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex items-center justify-center gap-4 text-white">
           <div className="flex flex-col items-center">
             <WeatherIcon className={`
-              h-8 w-8 text-blue-400
+              h-8 w-8
               lg:h-12 lg:w-12
             `}
             />
             <span className={`
-              text-xs text-blue-400
+              text-xs
               lg:text-sm
             `}
             >
               {weatherData.weather.data.weather}
             </span>
           </div>
-          <div className="text-5xl font-extrabold text-cyan-400">
+          <div className="text-5xl font-extrabold">
             {weatherData.weather.data.air.temperature.toFixed(1)}
             °
           </div>
@@ -126,7 +127,7 @@ const WeatherCard: FC = () => {
 
       {weatherData && (
         <div className={`
-          grid grid-cols-2 gap-x-4 text-xs
+          grid grid-cols-2 gap-x-4 text-xs text-white
           lg:text-sm
         `}
         >
