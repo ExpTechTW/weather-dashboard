@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { ArrowUp, Cloud, CloudDrizzle, CloudFog, CloudLightning, CloudMoon, CloudRain, CloudSnow, CloudSun, Cloudy, Droplet, Moon, Snowflake, Sun, Thermometer } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
+import moment from 'moment';
 
+import type { FC } from 'react';
 import type { LucideIcon } from 'lucide-react';
 
 interface WeatherData {
@@ -21,7 +23,7 @@ interface WeatherData {
   };
 }
 
-function WeatherHeader() {
+const WeatherCard: FC = () => {
   const searchParams = useSearchParams();
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
 
@@ -76,18 +78,12 @@ function WeatherHeader() {
 
   const WeatherIcon = weatherData ? getWeatherIcon(weatherData.weather.code, weatherData.weather.is_day) : Cloud;
 
-  const dateStr = new Date().toLocaleDateString('zh-TW', {
-    month: 'numeric',
-    day: 'numeric',
-    weekday: 'short',
-  }).replace('週', '');
-
-  const baseClasses = 'flex h-full w-full flex-col space-y-2 overflow-hidden rounded-lg border border-gray-700 bg-gray-900 shadow-lg';
+  const dateStr = moment().format('MM/DD (dd)');
 
   return (
     <div className={`
-      ${baseClasses}
-      p-2
+      flex flex-col gap-4 overflow-hidden rounded-lg border border-gray-700
+      bg-gray-900 p-2
       lg:p-4
     `}
     >
@@ -106,15 +102,15 @@ function WeatherHeader() {
       </div>
 
       {weatherData && (
-        <div className="flex items-center justify-center space-x-4">
-          <div className="flex flex-col items-center space-y-1">
+        <div className="flex items-center justify-center gap-4">
+          <div className="flex flex-col items-center">
             <WeatherIcon className={`
               h-8 w-8 text-blue-400
               lg:h-12 lg:w-12
             `}
             />
             <span className={`
-              text-xs text-gray-300
+              text-xs text-blue-400
               lg:text-sm
             `}
             >
@@ -123,7 +119,7 @@ function WeatherHeader() {
           </div>
           <div className="text-5xl font-extrabold text-cyan-400">
             {weatherData.weather.data.air.temperature.toFixed(1)}
-            °C
+            °
           </div>
         </div>
       )}
@@ -142,12 +138,12 @@ function WeatherHeader() {
                   lg:h-4 lg:w-4
                 `}
                 />
-                <span className="font-bold text-red-400">H</span>
+                最高
               </div>
-              <span className="font-bold text-red-400">
+              <strong>
                 {weatherData.weather.daily.high.temperature.toFixed(1)}
-                °C
-              </span>
+                °
+              </strong>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1">
@@ -156,11 +152,11 @@ function WeatherHeader() {
                   lg:h-4 lg:w-4
                 `}
                 />
-                <span className="font-bold text-blue-400">L</span>
+                最低
               </div>
-              <span className="font-bold text-blue-400">
+              <span className="font-bold">
                 {weatherData.weather.daily.low.temperature.toFixed(1)}
-                °C
+                °
               </span>
             </div>
           </div>
@@ -175,10 +171,10 @@ function WeatherHeader() {
                 />
                 <span>濕度</span>
               </div>
-              <span>
+              <strong>
                 {weatherData.weather.data.air.relative_humidity}
                 %
-              </span>
+              </strong>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1">
@@ -193,10 +189,10 @@ function WeatherHeader() {
                 />
                 <span>風速</span>
               </div>
-              <span>
+              <strong>
                 {weatherData.weather.data.wind.speed.toFixed(1)}
                 m/s
-              </span>
+              </strong>
             </div>
           </div>
         </div>
@@ -204,6 +200,7 @@ function WeatherHeader() {
 
     </div>
   );
-}
+};
+WeatherCard.displayName = 'WeatherCard';
 
-export default WeatherHeader;
+export default WeatherCard;

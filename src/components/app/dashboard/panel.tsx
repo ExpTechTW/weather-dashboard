@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 
-import WeatherHeader from '@/components/app/dashboard/weather-header';
+import WeatherCard from '@/components/app/dashboard/weather-header';
 import WeatherAlerts from '@/components/weather-alert';
 import WeatherAlert from '@/modal/weather';
 import RadarMap from '@/components/map/radar';
@@ -46,7 +46,7 @@ export function DashboardPanel({
       >
         <div className="flex flex-col gap-2">
           <Clock />
-          <WeatherHeader />
+          <WeatherCard />
         </div>
 
         <div className="mt-auto">
