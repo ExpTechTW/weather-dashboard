@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Cloud, CloudDrizzle, CloudFog, CloudLightning, CloudMoon, CloudRain, CloudSnow, CloudSun, Cloudy, Droplet, Moon, Snowflake, Sun, Wind } from 'lucide-react';
+import { ArrowUp, Cloud, CloudDrizzle, CloudFog, CloudLightning, CloudMoon, CloudRain, CloudSnow, CloudSun, Cloudy, Droplet, Moon, Snowflake, Sun, Wind } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
 import type { LucideIcon } from 'lucide-react';
@@ -11,7 +11,7 @@ interface WeatherData {
     station: { county: string; town: string };
     data: {
       weather: string;
-      wind: { speed: number };
+      wind: { speed: number; direction: number };
       air: { temperature: number; relative_humidity: number };
     };
     daily: {
@@ -48,7 +48,20 @@ function Clock() {
         const response = await fetch(`https://api-1.exptech.dev/api/v2/weather/realtime/${searchParams.get('region') || '711'}`);
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
-        const data = (await response.json()) as WeatherData;
+        const station = (await response.json()) as WeatherData;
+
+        const data: WeatherData = {
+          weather: {
+            ...station.weather,
+            data: {
+              ...station.weather.data,
+              wind: {
+                ...station.weather.data.wind,
+                direction: (station.weather.data.wind.direction + 180) % 360,
+              },
+            },
+          },
+        };
 
         setWeatherData(data);
       }
@@ -91,7 +104,7 @@ function Clock() {
         lg:text-sm
       `}
       >
-        <span className="truncate">{new Date().toLocaleDateString('zh-TW', { month: 'long', day: 'numeric', weekday: 'short' })}</span>
+        <span className="truncate pl-2">{new Date().toLocaleDateString('zh-TW', { month: 'long', day: 'numeric', weekday: 'short' })}</span>
         {weatherData && (
           <span className="truncate pl-2">
             {weatherData.weather.station.county}
@@ -183,6 +196,17 @@ function Clock() {
             {' '}
             m/s
           </span>
+          {weatherData && (
+            <ArrowUp
+              className={`
+                h-3 w-3 text-green-400
+                lg:h-4 lg:w-4
+              `}
+              style={{
+                transform: `rotate(${weatherData.weather.data.wind.direction}deg)`,
+              }}
+            />
+          )}
         </div>
       </div>
 
