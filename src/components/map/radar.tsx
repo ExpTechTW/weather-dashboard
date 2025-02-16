@@ -64,7 +64,7 @@ function RadarMap() {
         id: 'radarLayer',
         type: 'raster',
         source: 'radarTiles',
-        paint: { 'raster-opacity': 0.7 },
+        paint: { 'raster-opacity': 1 },
       });
     }
 
@@ -77,7 +77,7 @@ function RadarMap() {
           `${TILE_URL}/${radarTimes[currentFrame]}/{z}/{x}/{y}.png`,
         ]);
       }
-    }, 500);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [map, radarTimes, currentFrame]);
