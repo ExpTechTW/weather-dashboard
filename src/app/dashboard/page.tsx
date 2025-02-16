@@ -1,41 +1,28 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 
-import Clock from '@/components/clock';
-import WeatherAlerts from '@/components/weather-alert';
-import RadarMap from '@/components/map/radar';
-import OrientationHandler from '@/components/orientation-handler'; // 請確保路徑正確
-import WeatherAlert from '@/modal/weather';
+import OrientationHandler from '@/components/orientation-handler';
+import { SingleViewDashboard } from '@/components/view/single-view';
+import { MultiViewDashboard } from '@/components/view/multi-view';
 
-export default function DashBoard() {
-  const [alerts, setAlerts] = useState<WeatherAlert[]>([]);
+export default function DashboardPage() {
+  const searchParams = useSearchParams();
+  const isMixinMode = searchParams.get('mode') === 'mixin';
 
   return (
     <OrientationHandler>
       <Suspense fallback={<div>Loading...</div>}>
-        <div className="flex h-screen w-screen overflow-hidden bg-gray-900">
-          <div className={`
-            flex min-w-[320px] max-w-[360px] flex-col space-y-2 p-2
-            lg:min-w-[400px] lg:max-w-[440px] lg:space-y-4 lg:p-4
-          `}
-          >
-            <div className="relative">
-              <Clock />
-            </div>
-
-            <div className="flex-grow" />
-
-            <WeatherAlerts
-              alerts={alerts}
-              onAlertsChange={setAlerts}
-            />
-          </div>
-
-          <div className="flex-1">
-            <RadarMap />
-          </div>
-        </div>
+        {isMixinMode
+          ? (
+              <div className="grid h-screen w-screen grid-cols-2 grid-rows-2">
+                <MultiViewDashboard />
+              </div>
+            )
+          : (
+              <SingleViewDashboard />
+            )}
       </Suspense>
     </OrientationHandler>
   );
