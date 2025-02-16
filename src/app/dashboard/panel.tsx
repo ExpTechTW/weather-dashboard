@@ -3,8 +3,7 @@
 import Clock from '@/components/clock';
 import WeatherAlerts from '@/components/weather-alert';
 import WeatherAlert from '@/modal/weather';
-import BlurredMap from '@/components/blurred-map';
-import { BaseMap } from '@/components/map/base';
+import RadarMap from '@/components/map/radar';
 
 interface DashboardPanelProps {
   alerts: WeatherAlert[];
@@ -35,9 +34,7 @@ export function DashboardPanel({
       </div>
 
       <div className="col-span-3">
-        <BlurredMap isBlurred={true}>
-          <BaseMap />
-        </BlurredMap>
+        <RadarMap />
       </div>
     </div>
   );
