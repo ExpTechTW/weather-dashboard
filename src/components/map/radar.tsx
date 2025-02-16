@@ -29,6 +29,12 @@ function RadarMap() {
     }
 
     void fetchRadarTimes();
+
+    const interval = setInterval(() => {
+      void fetchRadarTimes();
+    }, 60000);
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
