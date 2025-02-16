@@ -1,12 +1,12 @@
-'use client';
+import React, { useEffect, useState } from 'react';
 
 import Clock from '@/components/clock';
 import WeatherAlerts from '@/components/weather-alert';
 import WeatherAlert from '@/modal/weather';
 import RadarMap from '@/components/map/radar';
-// import TsunamiMap from '@/components/map/tsunami';
-// import BlurredMap from '@/components/blurred-map';
-// import { BaseMap } from '@/components/map/base';
+import TsunamiMap from '@/components/map/tsunami';
+import BlurredMap from '@/components/blurred-map';
+import { BaseMap } from '@/components/map/base';
 
 interface DashboardPanelProps {
   alerts: WeatherAlert[];
@@ -17,6 +17,24 @@ export function DashboardPanel({
   alerts,
   onAlertsChange,
 }: DashboardPanelProps) {
+  const [currentMapIndex, setCurrentMapIndex] = useState(0);
+
+  const maps = [
+    <RadarMap key="radar" />,
+    <TsunamiMap key="tsunami" />,
+    <BlurredMap key="blurred" isBlurred={true}>
+      <BaseMap />
+    </BlurredMap>,
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentMapIndex((prevIndex) => (prevIndex + 1) % maps.length);
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const panelContent = (
     <div className="grid h-full w-full grid-cols-4 overflow-hidden bg-gray-900">
       <div className={`
@@ -37,11 +55,7 @@ export function DashboardPanel({
       </div>
 
       <div className="col-span-3">
-        <RadarMap />
-        {/* <TsunamiMap /> */}
-        {/* <BlurredMap isBlurred={true}>
-          <BaseMap />
-        </BlurredMap> */}
+        {maps[currentMapIndex]}
       </div>
     </div>
   );
@@ -52,3 +66,5 @@ export function DashboardPanel({
     </div>
   );
 }
+
+export default DashboardPanel;
