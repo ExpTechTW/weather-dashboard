@@ -25,7 +25,6 @@ function Clock() {
   const searchParams = useSearchParams();
   const [time, setTime] = useState<string>('');
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
-  const isMixinMode = searchParams.get('mode') === 'mixin';
 
   const getWeatherIcon = (code: number, isDay: number): LucideIcon => {
     const iconMap: Record<number, LucideIcon> = {
@@ -100,12 +99,12 @@ function Clock() {
   }).replace('週', '');
 
   const baseClasses = 'flex h-full w-full flex-col space-y-2 overflow-hidden rounded-lg border border-gray-700 bg-gray-900 shadow-lg';
-  const padding = isMixinMode ? 'p-2' : 'p-2 lg:p-4';
 
   return (
     <div className={`
       ${baseClasses}
-      ${padding}
+      p-2
+      lg:p-4
     `}
     >
       <div className={`
@@ -126,35 +125,19 @@ function Clock() {
         <div className="flex items-center justify-center space-x-4">
           <div className="flex flex-col items-center space-y-1">
             <WeatherIcon className={`
-              ${isMixinMode
-          ? 'h-6 w-6'
-          : `
-            h-8 w-8
-            lg:h-12 lg:w-12
-          `}
-              text-blue-400
+              h-8 w-8 text-blue-400
+              lg:h-12 lg:w-12
             `}
             />
             <span className={`
-              ${isMixinMode
-          ? 'text-[10px]'
-          : `
-            text-xs
-            lg:text-sm
-          `}
-              text-gray-300
+              text-xs text-gray-300
+              lg:text-sm
             `}
             >
               {weatherData.weather.data.weather}
             </span>
           </div>
-          <div className={`
-            ${isMixinMode
-          ? 'text-3xl'
-          : `text-5xl`}
-            font-extrabold text-cyan-400
-          `}
-          >
+          <div className="text-5xl font-extrabold text-cyan-400">
             {weatherData.weather.data.air.temperature.toFixed(1)}
             °C
           </div>
@@ -163,16 +146,11 @@ function Clock() {
 
       {weatherData && (
         <div className={`
-          ${isMixinMode ? 'flex flex-col space-y-1' : 'grid grid-cols-2 gap-x-4'}
-          text-xs
+          grid grid-cols-2 gap-x-4 text-xs
           lg:text-sm
         `}
         >
-          <div className={`
-            flex flex-col space-y-1
-            ${isMixinMode ? 'w-full' : ''}
-          `}
-          >
+          <div className="flex flex-col space-y-1">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1">
                 <Thermometer className={`
@@ -203,11 +181,7 @@ function Clock() {
             </div>
           </div>
 
-          <div className={`
-            flex flex-col space-y-1 text-white
-            ${isMixinMode ? 'w-full' : ''}
-          `}
-          >
+          <div className="flex flex-col space-y-1 text-white">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1">
                 <Droplet className={`
@@ -244,10 +218,8 @@ function Clock() {
         </div>
       )}
 
-      <div className={`
-        text-center font-bold tracking-wider text-white
-        ${isMixinMode ? 'text-4xl' : 'text-6xl'}
-      `}
+      <div
+        className="text-center text-5xl font-bold tracking-wider text-white"
       >
         {time || '--:--:--'}
       </div>

@@ -1,7 +1,5 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
-
 import Clock from '@/components/clock';
 import WeatherAlerts from '@/components/weather-alert';
 import WeatherAlert from '@/modal/weather';
@@ -17,9 +15,6 @@ export function DashboardPanel({
   alerts,
   onAlertsChange,
 }: DashboardPanelProps) {
-  const searchParams = useSearchParams();
-  const isMixinMode = searchParams.get('mode') === 'mixin';
-
   const panelContent = (
     <div className="grid h-full w-full grid-cols-4 overflow-hidden bg-gray-900">
       <div className={`
@@ -46,14 +41,6 @@ export function DashboardPanel({
       </div>
     </div>
   );
-
-  if (isMixinMode) {
-    return (
-      <div className="h-full w-full border-gray-700">
-        {panelContent}
-      </div>
-    );
-  }
 
   return (
     <div className="h-screen w-screen">
