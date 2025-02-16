@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Map, RasterTileSource } from 'maplibre-gl';
 import { Clock, Cloud } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
@@ -16,6 +16,18 @@ function RadarMap() {
   const [currentFrame, setCurrentFrame] = useState(0);
   const [map, setMap] = useState<Map | null>(null);
   const [isStyleLoaded, setIsStyleLoaded] = useState(false);
+
+  const setupMap = useCallback((mapInstance: Map) => {
+    if (mapInstance.isStyleLoaded()) {
+      setIsStyleLoaded(true);
+    }
+    else {
+      void mapInstance.once('style.load', () => {
+        setIsStyleLoaded(true);
+      });
+    }
+    setMap(mapInstance);
+  }, []);
 
   useEffect(() => {
     async function fetchRadarTimes() {
@@ -39,25 +51,6 @@ function RadarMap() {
 
     return () => clearInterval(interval);
   }, [searchParams]);
-
-  useEffect(() => {
-    if (!map) return;
-
-    const styleLoadHandler = () => {
-      setIsStyleLoaded(true);
-    };
-
-    if (map.isStyleLoaded()) {
-      setIsStyleLoaded(true);
-    }
-    else {
-      map.on('style.load', styleLoadHandler);
-    }
-
-    return () => {
-      map.off('style.load', styleLoadHandler);
-    };
-  }, [map]);
 
   useEffect(() => {
     if (!map || !isStyleLoaded || radarTimes.length === 0) return;
@@ -113,7 +106,7 @@ function RadarMap() {
 
   return (
     <div className="relative h-full w-full">
-      <BaseMap onMapLoaded={setMap} />
+      <BaseMap onMapLoaded={setupMap} />
 
       <div className={`
         absolute left-2 top-2 flex flex-col space-y-2
