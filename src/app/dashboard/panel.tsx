@@ -4,7 +4,7 @@ import Clock from '@/components/clock';
 import WeatherAlerts from '@/components/weather-alert';
 import WeatherAlert from '@/modal/weather';
 import RadarMap from '@/components/map/radar';
-import TsunamiMap from '@/components/map/tsunami';
+// import TsunamiMap from '@/components/map/tsunami';
 import BlurredMap from '@/components/blurred-map';
 import { BaseMap } from '@/components/map/base';
 
@@ -21,7 +21,7 @@ export function DashboardPanel({
 
   const maps = [
     <RadarMap key="radar" />,
-    <TsunamiMap key="tsunami" />,
+    // <TsunamiMap key="tsunami" />,
     <BlurredMap key="blurred" isBlurred={true}>
       <BaseMap />
     </BlurredMap>,
