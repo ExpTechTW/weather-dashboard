@@ -56,17 +56,26 @@ function RadarMap() {
     if (!map || !isStyleLoaded || radarTimes.length === 0) return;
 
     try {
-      map.dragRotate.disable();
-      map.dragPan.disable();
-      map.scrollZoom.disable();
-      map.boxZoom.disable();
-      map.doubleClickZoom.disable();
-      map.touchZoomRotate.disable();
-      map.keyboard.disable();
+      const disableControls = () => {
+        map.dragRotate.disable();
+        map.dragPan.disable();
+        map.scrollZoom.disable();
+        map.boxZoom.disable();
+        map.doubleClickZoom.disable();
+        map.touchZoomRotate.disable();
+        map.keyboard.disable();
+      };
 
-      map.fitBounds([[118.0, 21.2], [124.0, 25.8]], { padding: 20, duration: 0 });
+      const setupInitialView = () => {
+        map.fitBounds(
+          [[118.0, 21.2], [124.0, 25.8]],
+          { padding: 20, duration: 0 },
+        );
+      };
 
-      if (!map.getSource('radarTiles')) {
+      const initializeRadarLayer = () => {
+        if (map.getSource('radarTiles')) return;
+
         map.addSource('radarTiles', {
           type: 'raster',
           tiles: [`${TILE_URL}/${radarTimes[0]}/{z}/{x}/{y}.png`],
@@ -79,17 +88,37 @@ function RadarMap() {
           source: 'radarTiles',
           paint: { 'raster-opacity': 1 },
         });
-      }
+      };
 
-      const interval = setInterval(() => {
-        setCurrentFrame((prev) => (prev + 1) % radarTimes.length);
-
+      const updateRadarTiles = (frameIdx: number) => {
         const source = map.getSource('radarTiles');
         if (source && 'setTiles' in source) {
           (source as RasterTileSource).setTiles([
-            `${TILE_URL}/${radarTimes[currentFrame]}/{z}/{x}/{y}.png`,
+            `${TILE_URL}/${radarTimes[frameIdx]}/{z}/{x}/{y}.png`,
           ]);
         }
+      };
+
+      disableControls();
+      setupInitialView();
+      initializeRadarLayer();
+
+      let frameIndex = 0;
+      let shouldRepeatLastFrame = false;
+      const interval = setInterval(() => {
+        if (shouldRepeatLastFrame) {
+          frameIndex = 0;
+          shouldRepeatLastFrame = false;
+        }
+        else if (frameIndex === radarTimes.length - 1) {
+          shouldRepeatLastFrame = true;
+        }
+        else {
+          frameIndex = (frameIndex + 1) % radarTimes.length;
+        }
+
+        setCurrentFrame(frameIndex);
+        updateRadarTiles(frameIndex);
       }, 1000);
 
       return () => clearInterval(interval);
@@ -97,7 +126,7 @@ function RadarMap() {
     catch (error) {
       console.error('Error setting up map:', error);
     }
-  }, [map, isStyleLoaded, radarTimes, currentFrame]);
+  }, [map, isStyleLoaded, radarTimes]);
 
   function formatRadarTime(timestamp: string): string {
     const date = new Date(parseInt(timestamp));
