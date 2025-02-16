@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 
-import Clock from '@/components/clock';
+import WeatherHeader from '@/components/app/dashboard/weather-header';
 import WeatherAlerts from '@/components/weather-alert';
 import WeatherAlert from '@/modal/weather';
 import RadarMap from '@/components/map/radar';
 // import TsunamiMap from '@/components/map/tsunami';
 import BlurredMap from '@/components/blurred-map';
 import { BaseMap } from '@/components/map/base';
+
+import Clock from './clock';
 
 interface DashboardPanelProps {
   alerts: WeatherAlert[];
@@ -42,16 +44,17 @@ export function DashboardPanel({
         lg:space-y-4 lg:p-4
       `}
       >
-        <div className="relative">
+        <div className="flex flex-col gap-2">
           <Clock />
+          <WeatherHeader />
         </div>
 
-        <div className="flex-grow" />
-
-        <WeatherAlerts
-          alerts={alerts}
-          onAlertsChange={onAlertsChange}
-        />
+        <div className="mt-auto">
+          <WeatherAlerts
+            alerts={alerts}
+            onAlertsChange={onAlertsChange}
+          />
+        </div>
       </div>
 
       <div className="col-span-3">

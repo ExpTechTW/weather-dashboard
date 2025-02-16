@@ -5,7 +5,7 @@ import { Suspense, useState } from 'react';
 import OrientationHandler from '@/components/orientation-handler';
 import WeatherAlert from '@/modal/weather';
 
-import { DashboardPanel } from './panel';
+import { DashboardPanel } from '../../components/app/dashboard/panel';
 
 export default function DashboardPage() {
   const [alerts, setAlerts] = useState<WeatherAlert[]>([]);

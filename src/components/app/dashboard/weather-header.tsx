@@ -21,9 +21,8 @@ interface WeatherData {
   };
 }
 
-function Clock() {
+function WeatherHeader() {
   const searchParams = useSearchParams();
-  const [time, setTime] = useState<string>('');
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
 
   const getWeatherIcon = (code: number, isDay: number): LucideIcon => {
@@ -73,21 +72,6 @@ function Clock() {
     void fetchWeather();
     const weatherTimer = setInterval(() => void fetchWeather(), 60000);
     return () => clearInterval(weatherTimer);
-  }, []);
-
-  useEffect(() => {
-    const updateTime = () => {
-      setTime(new Date().toLocaleTimeString('zh-TW', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false,
-      }));
-    };
-
-    updateTime();
-    const timer = setInterval(updateTime, 1000);
-    return () => clearInterval(timer);
   }, []);
 
   const WeatherIcon = weatherData ? getWeatherIcon(weatherData.weather.code, weatherData.weather.is_day) : Cloud;
@@ -218,13 +202,8 @@ function Clock() {
         </div>
       )}
 
-      <div
-        className="text-center text-5xl font-bold tracking-wider text-white"
-      >
-        {time || '--:--:--'}
-      </div>
     </div>
   );
 }
 
-export default Clock;
+export default WeatherHeader;
