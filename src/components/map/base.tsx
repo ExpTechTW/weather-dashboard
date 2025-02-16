@@ -57,7 +57,6 @@ export function BaseMap({ onMapLoaded }: { onMapLoaded?: (map: Map) => void }) {
 
     mapRef.current = map;
 
-    // 如果有提供 onMapLoaded 回調，則傳遞地圖對象
     if (onMapLoaded) onMapLoaded(map);
 
     map.on('error', () => void 0);
