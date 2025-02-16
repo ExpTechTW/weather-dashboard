@@ -8,6 +8,7 @@ import type { Map } from 'maplibre-gl';
 
 function TsunamiMap() {
   const [map, setMap] = useState<Map | null>(null);
+  const [isStyleLoaded, setIsStyleLoaded] = useState(false);
 
   const setupMap = useCallback((mapInstance: Map) => {
     const interactions = [
@@ -25,10 +26,12 @@ function TsunamiMap() {
     void mapInstance.fitBounds([[118.0, 21.2], [124.0, 25.8]], { padding: 20, duration: 0 });
 
     if (mapInstance.isStyleLoaded()) {
+      setIsStyleLoaded(true);
       addTsunamiLayer(mapInstance);
     }
     else {
       void mapInstance.once('style.load', () => {
+        setIsStyleLoaded(true);
         addTsunamiLayer(mapInstance);
       });
     }
@@ -67,7 +70,7 @@ function TsunamiMap() {
   }, []);
 
   useEffect(() => {
-    if (!map) return;
+    if (!map || !isStyleLoaded) return;
 
     let timeoutId: NodeJS.Timeout;
     let isOn = true;
@@ -96,30 +99,42 @@ function TsunamiMap() {
     return () => {
       clearTimeout(timeoutId);
     };
+  }, [map, isStyleLoaded]);
+
+  useEffect(() => {
+    if (!map) return;
+
+    const styleLoadHandler = () => {
+      setIsStyleLoaded(true);
+    };
+
+    if (map.isStyleLoaded()) {
+      setIsStyleLoaded(true);
+    }
+    else {
+      map.on('style.load', styleLoadHandler);
+    }
+
+    return () => {
+      map.off('style.load', styleLoadHandler);
+    };
   }, [map]);
 
   return (
     <div className="relative h-full w-full">
       <BaseMap onMapLoaded={setupMap} />
-
-      <div
-        className={`
-          absolute left-2 top-2 flex flex-col space-y-2
-          lg:left-4 lg:top-4
-        `}
+      <div className={`
+        absolute left-2 top-2 flex flex-col space-y-2
+        lg:left-4 lg:top-4
+      `}
       >
-        <div
-          className={`
-            inline-flex w-fit items-center gap-1 rounded-lg bg-white/10 px-2
-            py-1.5 shadow-lg backdrop-blur-md
-            lg:gap-2 lg:px-3 lg:py-2
-          `}
+        <div className={`
+          inline-flex w-fit items-center gap-1 rounded-lg bg-white/10 px-2
+          py-1.5 shadow-lg backdrop-blur-md
+          lg:gap-2 lg:px-3 lg:py-2
+        `}
         >
-          <span
-            className="text-xl font-bold text-white"
-          >
-            海嘯資訊
-          </span>
+          <span className="text-xl font-bold text-white">海嘯資訊</span>
         </div>
       </div>
     </div>

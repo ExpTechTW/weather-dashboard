@@ -15,6 +15,7 @@ function RadarMap() {
   const [radarTimes, setRadarTimes] = useState<string[]>([]);
   const [currentFrame, setCurrentFrame] = useState(0);
   const [map, setMap] = useState<Map | null>(null);
+  const [isStyleLoaded, setIsStyleLoaded] = useState(false);
 
   useEffect(() => {
     async function fetchRadarTimes() {
@@ -23,7 +24,6 @@ function RadarMap() {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
         const timeList = (await response.json()) as string[];
-
         setRadarTimes(timeList.slice(-6 * Number(searchParams.get('radar-dispaly-hours') || '1')));
       }
       catch (error) {
@@ -38,49 +38,73 @@ function RadarMap() {
     }, 60000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
-    if (!map || radarTimes.length === 0) return;
+    if (!map) return;
 
-    map.dragRotate.disable();
-    map.dragPan.disable();
-    map.scrollZoom.disable();
-    map.boxZoom.disable();
-    map.doubleClickZoom.disable();
-    map.touchZoomRotate.disable();
-    map.keyboard.disable();
+    const styleLoadHandler = () => {
+      setIsStyleLoaded(true);
+    };
 
-    map.fitBounds([[118.0, 21.2], [124.0, 25.8]], { padding: 20, duration: 0 });
-
-    if (!map.getSource('radarTiles')) {
-      map.addSource('radarTiles', {
-        type: 'raster',
-        tiles: [`${TILE_URL}/${radarTimes[0]}/{z}/{x}/{y}.png`],
-        tileSize: 256,
-      });
-
-      map.addLayer({
-        id: 'radarLayer',
-        type: 'raster',
-        source: 'radarTiles',
-        paint: { 'raster-opacity': 1 },
-      });
+    if (map.isStyleLoaded()) {
+      setIsStyleLoaded(true);
+    }
+    else {
+      map.on('style.load', styleLoadHandler);
     }
 
-    const interval = setInterval(() => {
-      setCurrentFrame((prev) => (prev + 1) % radarTimes.length);
+    return () => {
+      map.off('style.load', styleLoadHandler);
+    };
+  }, [map]);
 
-      const source = map.getSource('radarTiles');
-      if (source && 'setTiles' in source) {
-        (source as RasterTileSource).setTiles([
-          `${TILE_URL}/${radarTimes[currentFrame]}/{z}/{x}/{y}.png`,
-        ]);
+  useEffect(() => {
+    if (!map || !isStyleLoaded || radarTimes.length === 0) return;
+
+    try {
+      map.dragRotate.disable();
+      map.dragPan.disable();
+      map.scrollZoom.disable();
+      map.boxZoom.disable();
+      map.doubleClickZoom.disable();
+      map.touchZoomRotate.disable();
+      map.keyboard.disable();
+
+      map.fitBounds([[118.0, 21.2], [124.0, 25.8]], { padding: 20, duration: 0 });
+
+      if (!map.getSource('radarTiles')) {
+        map.addSource('radarTiles', {
+          type: 'raster',
+          tiles: [`${TILE_URL}/${radarTimes[0]}/{z}/{x}/{y}.png`],
+          tileSize: 256,
+        });
+
+        map.addLayer({
+          id: 'radarLayer',
+          type: 'raster',
+          source: 'radarTiles',
+          paint: { 'raster-opacity': 1 },
+        });
       }
-    }, 1000);
 
-    return () => clearInterval(interval);
-  }, [map, radarTimes, currentFrame]);
+      const interval = setInterval(() => {
+        setCurrentFrame((prev) => (prev + 1) % radarTimes.length);
+
+        const source = map.getSource('radarTiles');
+        if (source && 'setTiles' in source) {
+          (source as RasterTileSource).setTiles([
+            `${TILE_URL}/${radarTimes[currentFrame]}/{z}/{x}/{y}.png`,
+          ]);
+        }
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+    catch (error) {
+      console.error('Error setting up map:', error);
+    }
+  }, [map, isStyleLoaded, radarTimes, currentFrame]);
 
   function formatRadarTime(timestamp: string): string {
     const date = new Date(parseInt(timestamp));
