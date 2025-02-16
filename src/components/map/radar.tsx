@@ -91,16 +91,33 @@ function RadarMap() {
     <div className="relative h-full w-full">
       <BaseMap onMapLoaded={setMap} />
 
-      <div className="absolute left-4 top-4 flex flex-col space-y-2">
-        <div className="rounded-lg bg-white/10 p-4 shadow-lg backdrop-blur-md">
+      <div className={`
+        absolute left-2 top-2 flex flex-col space-y-2
+        lg:left-4 lg:top-4
+      `}
+      >
+        <div className={`
+          rounded-lg bg-white/10 p-2 shadow-lg backdrop-blur-md
+          lg:p-4
+        `}
+        >
           <div className="flex items-center space-x-2">
-            <Clock className="h-6 w-6 text-white" />
-            <span className="text-lg font-bold text-white">
+            <Clock className={`
+              h-4 w-4 text-white
+              lg:h-6 lg:w-6
+            `}
+            />
+            <span className={`
+              text-base font-bold text-white
+              lg:text-lg
+            `}
+            >
               {radarTimes.length > 0 ? formatRadarTime(radarTimes[currentFrame]) : '載入中...'}
             </span>
           </div>
           <div className={`
-            mt-2 h-2 w-48 overflow-hidden rounded-full bg-gray-600/50
+            mt-1 h-1.5 w-32 overflow-hidden rounded-full bg-gray-600/50
+            lg:mt-2 lg:h-2 lg:w-48
           `}
           >
             <div
@@ -113,12 +130,21 @@ function RadarMap() {
         </div>
 
         <div className={`
-          inline-flex w-fit items-center gap-2 rounded-lg bg-white/10 px-3 py-2
-          shadow-lg backdrop-blur-md
+          inline-flex w-fit items-center gap-1 rounded-lg bg-white/10 px-2
+          py-1.5 shadow-lg backdrop-blur-md
+          lg:gap-2 lg:px-3 lg:py-2
         `}
         >
-          <Cloud className="h-5 w-5 text-white" />
-          <span className="text-sm font-medium text-white">
+          <Cloud className={`
+            h-4 w-4 text-white
+            lg:h-5 lg:w-5
+          `}
+          />
+          <span className={`
+            text-xs font-medium text-white
+            lg:text-sm
+          `}
+          >
             雷達合成回波圖
           </span>
         </div>
