@@ -44,6 +44,13 @@ export function BaseMap({ onMapLoaded }: { onMapLoaded?: (map: Map) => void }) {
             'source-layer': 'city',
             'paint': { 'line-color': '#a9b4bc' },
           },
+          {
+            'id': 'town',
+            'type': 'fill',
+            'source': 'map',
+            'source-layer': 'town',
+            'paint': { 'fill-color': 'transparent' },
+          },
         ],
       },
       center: [121.6, 23.5],
