@@ -35,7 +35,7 @@ export function BaseMap({ onMapLoaded }: { onMapLoaded?: (map: Map) => void }) {
             'type': 'fill',
             'source': 'map',
             'source-layer': 'city',
-            'paint': { 'fill-color': '#3F4045', 'fill-opacity': 1 },
+            'paint': { 'fill-color': '#3F4045' },
           },
           {
             'id': 'county-outline',

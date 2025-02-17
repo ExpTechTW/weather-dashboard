@@ -16,7 +16,7 @@ function BlurredMap({ children, isBlurred }: BlurredMapProps) {
         >
           <div className="rounded-lg bg-gray-800 p-6 text-center">
             <p className="text-4xl font-bold text-white">
-              目前沒有生效中的天氣警特報
+              目前指定區域沒有生效中的天氣警特報
             </p>
           </div>
         </div>

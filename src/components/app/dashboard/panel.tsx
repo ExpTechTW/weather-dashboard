@@ -7,7 +7,7 @@ import WeatherAlert from '@/modal/weather';
 // import RadarMap from '@/components/map/radar';
 // import TsunamiMap from '@/components/map/tsunami';
 import BlurredMap from '@/components/blurred-map';
-import WeatherMap from '@/components/map/weather';
+import WeatherMap from '@/components/map/local-alert';
 
 interface DashboardPanelProps {
   alerts: WeatherAlert[];
