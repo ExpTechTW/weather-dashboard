@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
+import React, { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 
-import WeatherCard from "@/components/app/dashboard/weather-header";
-import WeatherAlerts from "@/components/weather-alert";
-import WeatherAlert from "@/modal/weather";
-import RadarMap from "@/components/map/radar";
+import WeatherCard from '@/components/app/dashboard/weather-header';
+import WeatherAlerts from '@/components/weather-alert';
+import WeatherAlert from '@/modal/weather';
+import RadarMap from '@/components/map/radar';
 // import TsunamiMap from '@/components/map/tsunami';
 // import BlurredMap from '@/components/blurred-map';
 // import WeatherMap from '@/components/map/local-alert';
@@ -18,7 +18,7 @@ export function DashboardPanel({
   alerts,
   onAlertsChange,
 }: DashboardPanelProps) {
-  const Clock = dynamic(() => import("@/components/app/dashboard/clock"), {
+  const Clock = dynamic(() => import('@/components/app/dashboard/clock'), {
     ssr: false,
   });
   const [currentMapIndex, setCurrentMapIndex] = useState(0);
@@ -43,9 +43,9 @@ export function DashboardPanel({
     <div className="grid h-full w-full grid-cols-4 overflow-hidden bg-gray-900">
       <div
         className={`
-        flex flex-col space-y-2 p-2
-        lg:space-y-4 lg:p-4
-      `}
+          flex flex-col space-y-2 p-2
+          lg:space-y-4 lg:p-4
+        `}
       >
         <div className="flex flex-col gap-2">
           <Clock />
