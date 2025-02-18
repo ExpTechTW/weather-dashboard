@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
+import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 
-import WeatherCard from '@/components/app/dashboard/weather-header';
-import WeatherAlerts from '@/components/weather-alert';
-import WeatherAlert from '@/modal/weather';
-// import RadarMap from '@/components/map/radar';
+import WeatherCard from "@/components/app/dashboard/weather-header";
+import WeatherAlerts from "@/components/weather-alert";
+import WeatherAlert from "@/modal/weather";
+import RadarMap from "@/components/map/radar";
 // import TsunamiMap from '@/components/map/tsunami';
-import BlurredMap from '@/components/blurred-map';
-import WeatherMap from '@/components/map/local-alert';
+// import BlurredMap from '@/components/blurred-map';
+// import WeatherMap from '@/components/map/local-alert';
 
 interface DashboardPanelProps {
   alerts: WeatherAlert[];
@@ -18,15 +18,17 @@ export function DashboardPanel({
   alerts,
   onAlertsChange,
 }: DashboardPanelProps) {
-  const Clock = dynamic(() => import('@/components/app/dashboard/clock'), { ssr: false });
+  const Clock = dynamic(() => import("@/components/app/dashboard/clock"), {
+    ssr: false,
+  });
   const [currentMapIndex, setCurrentMapIndex] = useState(0);
 
   const maps = [
-    // <RadarMap key="radar" />,
+    <RadarMap key="radar" />,
     // <TsunamiMap key="tsunami" />,
-    <BlurredMap key="blurred" isBlurred={false}>
-      <WeatherMap />
-    </BlurredMap>,
+    // <BlurredMap key="blurred" isBlurred={false}>
+    //   <WeatherMap />
+    // </BlurredMap>,
   ];
 
   useEffect(() => {
@@ -39,7 +41,8 @@ export function DashboardPanel({
 
   const panelContent = (
     <div className="grid h-full w-full grid-cols-4 overflow-hidden bg-gray-900">
-      <div className={`
+      <div
+        className={`
         flex flex-col space-y-2 p-2
         lg:space-y-4 lg:p-4
       `}
@@ -50,24 +53,15 @@ export function DashboardPanel({
         </div>
 
         <div className="mt-auto">
-          <WeatherAlerts
-            alerts={alerts}
-            onAlertsChange={onAlertsChange}
-          />
+          <WeatherAlerts alerts={alerts} onAlertsChange={onAlertsChange} />
         </div>
       </div>
 
-      <div className="col-span-3">
-        {maps[currentMapIndex]}
-      </div>
+      <div className="col-span-3">{maps[currentMapIndex]}</div>
     </div>
   );
 
-  return (
-    <div className="h-screen w-screen">
-      {panelContent}
-    </div>
-  );
+  return <div className="h-screen w-screen">{panelContent}</div>;
 }
 
 export default DashboardPanel;
