@@ -16,4 +16,4 @@
 
 ## 範例
 
-`https://status.exptech.dev/weather-dashboard/dashboard?region=100&radar-dispaly-hours=3`
+`https://weather.exptech.com.tw/dashboard?region=100&radar-dispaly-hours=3`
