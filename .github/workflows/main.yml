@@ -47,8 +47,8 @@ jobs:
       with:
         host: ${{ secrets.HOST }}
         username: yuyu1015
-        key: ${{ secrets.KEY }}
+        password: ${{ secrets.PASSWORD }}
         script: |
           cd /home/yuyu1015/weather-dashboard
           git pull
-          docker compose up -d --build weather-dashboard
+          docker compose up -d --build weather-dashboard-dev
