@@ -47,7 +47,7 @@ jobs:
       with:
         host: ${{ secrets.HOST }}
         username: yuyu1015
-        password: ${{ secrets.PASSWORD }}
+        key: ${{ secrets.KEY }}
         script: |
           cd /home/yuyu1015/weather-dashboard
           git pull
