@@ -51,4 +51,4 @@ jobs:
         script: |
           cd /home/yuyu1015/weather-dashboard
           git pull
-          docker compose up -d --build weather-dashboard
+          docker compose up -d --build weather-dashboard-dev
