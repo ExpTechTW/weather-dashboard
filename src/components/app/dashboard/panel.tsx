@@ -5,6 +5,7 @@ import WeatherCard from '@/components/app/dashboard/weather-header';
 import WeatherAlerts from '@/components/weather-alert';
 import WeatherAlert from '@/modal/weather';
 import RadarMap from '@/components/map/radar';
+import LocalCard from '@/components/app/dashboard/local-header';
 // import TsunamiMap from '@/components/map/tsunami';
 // import BlurredMap from '@/components/blurred-map';
 // import WeatherMap from '@/components/map/local-alert';
@@ -50,6 +51,7 @@ export function DashboardPanel({
         <div className="flex flex-col gap-2">
           <Clock />
           <WeatherCard />
+          <LocalCard />
         </div>
 
         <div className="mt-auto">

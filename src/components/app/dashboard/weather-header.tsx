@@ -1,5 +1,21 @@
 import { useEffect, useState } from 'react';
-import { ArrowUp, Cloud, CloudDrizzle, CloudFog, CloudLightning, CloudMoon, CloudRain, CloudSnow, CloudSun, Cloudy, Droplet, Moon, Snowflake, Sun, Thermometer } from 'lucide-react';
+import {
+  ArrowUp,
+  Cloud,
+  CloudDrizzle,
+  CloudFog,
+  CloudLightning,
+  CloudMoon,
+  CloudRain,
+  CloudSnow,
+  CloudSun,
+  Cloudy,
+  Droplet,
+  Moon,
+  Snowflake,
+  Sun,
+  Thermometer,
+} from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
 import pkg from '../../../../package.json';
@@ -46,25 +62,30 @@ const WeatherCard: FC = () => {
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        const response = await fetch(`https://api-1.exptech.dev/api/v2/weather/realtime/${searchParams.get('region') || '711'}`);
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        const response = await fetch(
+          `https://api-1.exptech.dev/api/v2/weather/realtime/${searchParams.get('region') || '711'
+          }`,
+        );
+        if (!response.ok)
+          throw new Error(`HTTP error! Status: ${response.status}`);
 
         const station = (await response.json()) as WeatherData;
 
-        const data: WeatherData = {
-          weather: {
-            ...station.weather,
-            data: {
-              ...station.weather.data,
-              wind: {
-                ...station.weather.data.wind,
-                direction: (station.weather.data.wind.direction + 180) % 360,
+        if (station.weather) {
+          const data: WeatherData = {
+            weather: {
+              ...station.weather,
+              data: {
+                ...station.weather.data,
+                wind: {
+                  ...station.weather.data.wind,
+                  direction: (station.weather.data.wind.direction + 180) % 360,
+                },
               },
             },
-          },
-        };
-
-        setWeatherData(data);
+          };
+          setWeatherData(data);
+        }
       }
       catch (error) {
         console.error('Error fetching weather:', error);
@@ -76,19 +97,25 @@ const WeatherCard: FC = () => {
     return () => clearInterval(weatherTimer);
   }, []);
 
-  const WeatherIcon = weatherData ? getWeatherIcon(weatherData.weather.code, weatherData.weather.is_day) : Cloud;
+  const WeatherIcon = weatherData
+    ? getWeatherIcon(weatherData.weather.code, weatherData.weather.is_day)
+    : Cloud;
+
+  // if (!weatherData?.weather) return;
 
   return (
-    <div className={`
-      flex flex-col gap-4 overflow-hidden rounded-lg border border-gray-700
-      bg-gray-900 p-2
-      lg:p-4
-    `}
-    >
-      <div className={`
-        flex items-center justify-between text-xs text-gray-300
-        sm:text-sm
+    <div
+      className={`
+        flex flex-col gap-4 overflow-hidden rounded-lg border border-gray-700
+        bg-gray-900 p-2
+        lg:p-4
       `}
+    >
+      <div
+        className={`
+          flex items-center justify-between text-xs text-gray-300
+          sm:text-sm
+        `}
       >
         <span className="truncate pl-2">
           v
@@ -105,15 +132,17 @@ const WeatherCard: FC = () => {
       {weatherData && (
         <div className="flex items-center justify-center gap-4 text-white">
           <div className="flex flex-col items-center">
-            <WeatherIcon className={`
-              h-8 w-8
-              lg:h-12 lg:w-12
-            `}
+            <WeatherIcon
+              className={`
+                h-8 w-8
+                lg:h-12 lg:w-12
+              `}
             />
-            <span className={`
-              text-xs
-              lg:text-sm
-            `}
+            <span
+              className={`
+                text-xs
+                lg:text-sm
+              `}
             >
               {weatherData.weather.data.weather}
             </span>
@@ -126,18 +155,20 @@ const WeatherCard: FC = () => {
       )}
 
       {weatherData && (
-        <div className={`
-          grid grid-cols-2 gap-x-4 text-xs text-white
-          lg:text-sm
-        `}
+        <div
+          className={`
+            grid grid-cols-2 gap-x-4 text-xs text-white
+            lg:text-sm
+          `}
         >
           <div className="flex flex-col space-y-1">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1">
-                <Thermometer className={`
-                  h-3 w-3 text-red-400
-                  lg:h-4 lg:w-4
-                `}
+                <Thermometer
+                  className={`
+                    h-3 w-3 text-red-400
+                    lg:h-4 lg:w-4
+                  `}
                 />
                 最高
               </div>
@@ -148,10 +179,11 @@ const WeatherCard: FC = () => {
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1">
-                <Thermometer className={`
-                  h-3 w-3 text-blue-400
-                  lg:h-4 lg:w-4
-                `}
+                <Thermometer
+                  className={`
+                    h-3 w-3 text-blue-400
+                    lg:h-4 lg:w-4
+                  `}
                 />
                 最低
               </div>
@@ -165,10 +197,11 @@ const WeatherCard: FC = () => {
           <div className="flex flex-col space-y-1 text-white">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1">
-                <Droplet className={`
-                  h-3 w-3 text-blue-400
-                  lg:h-4 lg:w-4
-                `}
+                <Droplet
+                  className={`
+                    h-3 w-3 text-blue-400
+                    lg:h-4 lg:w-4
+                  `}
                 />
                 <span>濕度</span>
               </div>
@@ -198,7 +231,6 @@ const WeatherCard: FC = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };
