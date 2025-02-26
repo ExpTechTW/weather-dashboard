@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { ArrowUp, Cloud, CloudDrizzle, CloudFog, CloudLightning, CloudMoon, CloudRain, CloudSnow, CloudSun, Cloudy, Droplet, Moon, Snowflake, Sun, Thermometer } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
-import pkg from '../../../../package.json';
+import pkg from '@/../package.json';
 
 import type { FC } from 'react';
 import type { LucideIcon } from 'lucide-react';
