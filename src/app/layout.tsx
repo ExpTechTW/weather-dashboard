@@ -1,10 +1,5 @@
-'use client';
-
 import { Manrope } from 'next/font/google';
-import { usePathname } from 'next/navigation';
 
-import AppFooter from '@/components/app/footer';
-import AppHeader from '@/components/app/header';
 import { ThemeProvider } from '@/components/theme/provider';
 import { cn } from '@/lib/utils';
 
@@ -15,10 +10,8 @@ type Props = Readonly<{
 }>;
 
 const manrope = Manrope({ subsets: ['latin'] });
-export default function RootLayout({ children }: Props) {
-  const pathname = usePathname();
-  const isDashboard = pathname === '/dashboard';
 
+export default function RootLayout({ children }: Props) {
   return (
     <html lang="zh-TW" suppressHydrationWarning>
       <title>Weather Dashboard</title>
@@ -30,16 +23,13 @@ export default function RootLayout({ children }: Props) {
           defaultTheme="system"
           enableSystem
         >
-          {!isDashboard && <AppHeader />}
           <main className={cn(
             `flex min-h-dvh flex-col items-center tabular-nums`,
             manrope.className,
-            !isDashboard && `pt-16`,
           )}
           >
             {children}
           </main>
-          {!isDashboard && <AppFooter />}
         </ThemeProvider>
       </body>
     </html>

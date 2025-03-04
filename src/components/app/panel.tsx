@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 
-import WeatherCard from '@/components/app/dashboard/weather-header';
+import WeatherCard from '@/components/app/weather-header';
 import WeatherAlerts from '@/components/weather-alert';
 import WeatherAlert from '@/modal/weather';
 import RadarMap from '@/components/map/radar';
@@ -18,7 +18,7 @@ export function DashboardPanel({
   alerts,
   onAlertsChange,
 }: DashboardPanelProps) {
-  const Clock = dynamic(() => import('@/components/app/dashboard/clock'), {
+  const Clock = dynamic(() => import('@/components/app/clock'), {
     ssr: false,
   });
   const [currentMapIndex, setCurrentMapIndex] = useState(0);
