@@ -73,35 +73,84 @@ function RadarMap() {
         );
       };
 
-      const initializeRadarLayer = () => {
-        if (map.getSource('radarTiles')) return;
+      const cleanupUnusedLayers = () => {
+        const currentTimeStamps = radarTimes.map((time) => time);
 
-        map.addSource('radarTiles', {
-          type: 'raster',
-          tiles: [`${TILE_URL}/${radarTimes[0]}/{z}/{x}/{y}.png`],
-          tileSize: 256,
-        });
+        const allRadarLayers = map.getStyle().layers
+          .filter((layer) => layer.id.startsWith('radarLayer-'))
+          .map((layer) => {
+            const index = parseInt(layer.id.split('-')[1]);
+            const sourceId = `radarTiles-${index}`;
+            let timestamp = '';
+            if (map.getSource(sourceId)) {
+              const source = map.getSource(sourceId) as RasterTileSource;
+              if (source.tiles && source.tiles.length > 0) {
+                const tileUrl = source.tiles[0];
+                const match = tileUrl.match(`${TILE_URL}/([^/]+)/`);
+                if (match && match[1]) {
+                  timestamp = match[1];
+                }
+              }
+            }
+            return { layerId: layer.id, sourceId, timestamp };
+          });
 
-        map.addLayer({
-          id: 'radarLayer',
-          type: 'raster',
-          source: 'radarTiles',
-          paint: { 'raster-opacity': 1 },
+        allRadarLayers.forEach(({ layerId, sourceId, timestamp }) => {
+          if (timestamp && !currentTimeStamps.includes(timestamp)) {
+            if (map.getLayer(layerId)) {
+              map.removeLayer(layerId);
+            }
+            if (map.getSource(sourceId)) {
+              map.removeSource(sourceId);
+            }
+          }
         });
       };
 
-      const updateRadarTiles = (frameIdx: number) => {
-        const source = map.getSource('radarTiles');
-        if (source && 'setTiles' in source) {
-          (source as RasterTileSource).setTiles([
-            `${TILE_URL}/${radarTimes[frameIdx]}/{z}/{x}/{y}.png`,
-          ]);
+      const initializeRadarLayers = () => {
+        cleanupUnusedLayers();
+
+        radarTimes.forEach((time, index) => {
+          const sourceId = `radarTiles-${index}`;
+          const layerId = `radarLayer-${index}`;
+
+          if (!map.getSource(sourceId)) {
+            map.addSource(sourceId, {
+              type: 'raster',
+              tiles: [`${TILE_URL}/${time}/{z}/{x}/{y}.png`],
+              tileSize: 256,
+            });
+          }
+
+          if (!map.getLayer(layerId)) {
+            map.addLayer({
+              id: layerId,
+              type: 'raster',
+              source: sourceId,
+              paint: { 'raster-opacity': index === 0 ? 1 : 0 },
+            });
+          }
+          else {
+            map.setPaintProperty(layerId, 'raster-opacity', index === 0 ? 1 : 0);
+          }
+        });
+      };
+
+      const showRadarFrame = (frameIdx: number) => {
+        radarTimes.forEach((_, index) => {
+          if (map.getLayer(`radarLayer-${index}`)) {
+            map.setPaintProperty(`radarLayer-${index}`, 'raster-opacity', 0);
+          }
+        });
+
+        if (map.getLayer(`radarLayer-${frameIdx}`)) {
+          map.setPaintProperty(`radarLayer-${frameIdx}`, 'raster-opacity', 1);
         }
       };
 
       disableControls();
       setupInitialView();
-      initializeRadarLayer();
+      initializeRadarLayers();
 
       let frameIndex = 0;
       let shouldRepeatLastFrame = false;
@@ -118,7 +167,7 @@ function RadarMap() {
         }
 
         setCurrentFrame(frameIndex);
-        updateRadarTiles(frameIndex);
+        showRadarFrame(frameIndex);
       }, 1000);
 
       return () => clearInterval(interval);
