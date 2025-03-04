@@ -36,7 +36,12 @@ function RadarMap() {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
         const timeList = (await response.json()) as string[];
-        setRadarTimes(timeList.slice(-6 * Number(searchParams.get('radar-dispaly-hours') || '1')));
+        const newRadarTimes = timeList.slice(-6 * Number(searchParams.get('radar-dispaly-hours') || '1'));
+        setRadarTimes(newRadarTimes);
+
+        if (map && isStyleLoaded) {
+          initializeRadarLayers(newRadarTimes);
+        }
       }
       catch (error) {
         console.error('Error fetching radar times:', error instanceof Error ? error.message : error);
@@ -50,7 +55,7 @@ function RadarMap() {
     }, 60000);
 
     return () => clearInterval(interval);
-  }, [searchParams]);
+  }, [map, isStyleLoaded, searchParams]);
 
   useEffect(() => {
     if (!map || !isStyleLoaded || radarTimes.length === 0) return;
@@ -73,84 +78,9 @@ function RadarMap() {
         );
       };
 
-      const cleanupUnusedLayers = () => {
-        const currentTimeStamps = radarTimes.map((time) => time);
-
-        const allRadarLayers = map.getStyle().layers
-          .filter((layer) => layer.id.startsWith('radarLayer-'))
-          .map((layer) => {
-            const index = parseInt(layer.id.split('-')[1]);
-            const sourceId = `radarTiles-${index}`;
-            let timestamp = '';
-            if (map.getSource(sourceId)) {
-              const source = map.getSource(sourceId) as RasterTileSource;
-              if (source.tiles && source.tiles.length > 0) {
-                const tileUrl = source.tiles[0];
-                const match = tileUrl.match(`${TILE_URL}/([^/]+)/`);
-                if (match && match[1]) {
-                  timestamp = match[1];
-                }
-              }
-            }
-            return { layerId: layer.id, sourceId, timestamp };
-          });
-
-        allRadarLayers.forEach(({ layerId, sourceId, timestamp }) => {
-          if (timestamp && !currentTimeStamps.includes(timestamp)) {
-            if (map.getLayer(layerId)) {
-              map.removeLayer(layerId);
-            }
-            if (map.getSource(sourceId)) {
-              map.removeSource(sourceId);
-            }
-          }
-        });
-      };
-
-      const initializeRadarLayers = () => {
-        cleanupUnusedLayers();
-
-        radarTimes.forEach((time, index) => {
-          const sourceId = `radarTiles-${index}`;
-          const layerId = `radarLayer-${index}`;
-
-          if (!map.getSource(sourceId)) {
-            map.addSource(sourceId, {
-              type: 'raster',
-              tiles: [`${TILE_URL}/${time}/{z}/{x}/{y}.png`],
-              tileSize: 256,
-            });
-          }
-
-          if (!map.getLayer(layerId)) {
-            map.addLayer({
-              id: layerId,
-              type: 'raster',
-              source: sourceId,
-              paint: { 'raster-opacity': index === 0 ? 1 : 0 },
-            });
-          }
-          else {
-            map.setPaintProperty(layerId, 'raster-opacity', index === 0 ? 1 : 0);
-          }
-        });
-      };
-
-      const showRadarFrame = (frameIdx: number) => {
-        radarTimes.forEach((_, index) => {
-          if (map.getLayer(`radarLayer-${index}`)) {
-            map.setPaintProperty(`radarLayer-${index}`, 'raster-opacity', 0);
-          }
-        });
-
-        if (map.getLayer(`radarLayer-${frameIdx}`)) {
-          map.setPaintProperty(`radarLayer-${frameIdx}`, 'raster-opacity', 1);
-        }
-      };
-
       disableControls();
       setupInitialView();
-      initializeRadarLayers();
+      initializeRadarLayers(radarTimes);
 
       let frameIndex = 0;
       let shouldRepeatLastFrame = false;
@@ -176,6 +106,85 @@ function RadarMap() {
       console.error('Error setting up map:', error);
     }
   }, [map, isStyleLoaded, radarTimes]);
+
+  const cleanupUnusedLayers = (currentTimeStamps: string[]) => {
+    if (!map || !isStyleLoaded) return;
+
+    const allRadarLayers = map.getStyle().layers
+      .filter((layer) => layer.id.startsWith('radarLayer-'))
+      .map((layer) => {
+        const index = parseInt(layer.id.split('-')[1]);
+        const sourceId = `radarTiles-${index}`;
+        let timestamp = '';
+        if (map.getSource(sourceId)) {
+          const source = map.getSource(sourceId) as RasterTileSource;
+          if (source.tiles && source.tiles.length > 0) {
+            const tileUrl = source.tiles[0];
+            const match = tileUrl.match(`${TILE_URL}/([^/]+)/`);
+            if (match && match[1]) {
+              timestamp = match[1];
+            }
+          }
+        }
+        return { layerId: layer.id, sourceId, timestamp };
+      });
+
+    allRadarLayers.forEach(({ layerId, sourceId, timestamp }) => {
+      if (timestamp && !currentTimeStamps.includes(timestamp)) {
+        if (map.getLayer(layerId)) {
+          map.removeLayer(layerId);
+        }
+        if (map.getSource(sourceId)) {
+          map.removeSource(sourceId);
+        }
+      }
+    });
+  };
+
+  const initializeRadarLayers = (times: string[]) => {
+    if (!map || !isStyleLoaded) return;
+
+    cleanupUnusedLayers(times);
+
+    times.forEach((time, index) => {
+      const sourceId = `radarTiles-${index}`;
+      const layerId = `radarLayer-${index}`;
+
+      if (!map.getSource(sourceId)) {
+        map.addSource(sourceId, {
+          type: 'raster',
+          tiles: [`${TILE_URL}/${time}/{z}/{x}/{y}.png`],
+          tileSize: 256,
+        });
+      }
+
+      if (!map.getLayer(layerId)) {
+        map.addLayer({
+          id: 'radarLayer-' + index,
+          type: 'raster',
+          source: sourceId,
+          paint: { 'raster-opacity': index === 0 ? 1 : 0 },
+        });
+      }
+      else {
+        map.setPaintProperty(layerId, 'raster-opacity', index === 0 ? 1 : 0);
+      }
+    });
+  };
+
+  const showRadarFrame = (frameIdx: number) => {
+    if (!map || !isStyleLoaded) return;
+
+    radarTimes.forEach((_, index) => {
+      if (map.getLayer(`radarLayer-${index}`)) {
+        map.setPaintProperty(`radarLayer-${index}`, 'raster-opacity', 0);
+      }
+    });
+
+    if (map.getLayer(`radarLayer-${frameIdx}`)) {
+      map.setPaintProperty(`radarLayer-${frameIdx}`, 'raster-opacity', 1);
+    }
+  };
 
   function formatRadarTime(timestamp: string): string {
     const date = new Date(parseInt(timestamp));
