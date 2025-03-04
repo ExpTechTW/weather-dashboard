@@ -150,7 +150,22 @@ function RadarMap() {
       const sourceId = `radarTiles-${index}`;
       const layerId = `radarLayer-${index}`;
 
-      if (!map.getSource(sourceId)) {
+      if (map.getSource(sourceId)) {
+        const source = map.getSource(sourceId) as RasterTileSource;
+        if (source.tiles && source.tiles[0] && !source.tiles[0].includes(`/${time}/`)) {
+          if (map.getLayer(layerId)) {
+            map.removeLayer(layerId);
+          }
+          map.removeSource(sourceId);
+
+          map.addSource(sourceId, {
+            type: 'raster',
+            tiles: [`${TILE_URL}/${time}/{z}/{x}/{y}.png`],
+            tileSize: 256,
+          });
+        }
+      }
+      else {
         map.addSource(sourceId, {
           type: 'raster',
           tiles: [`${TILE_URL}/${time}/{z}/{x}/{y}.png`],
@@ -160,7 +175,7 @@ function RadarMap() {
 
       if (!map.getLayer(layerId)) {
         map.addLayer({
-          id: 'radarLayer-' + index,
+          id: layerId,
           type: 'raster',
           source: sourceId,
           paint: { 'raster-opacity': index === 0 ? 1 : 0 },
