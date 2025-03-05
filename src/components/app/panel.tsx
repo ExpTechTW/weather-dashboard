@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 
 import WeatherCard from '@/components/app/weather-header';
+import BlurredMap from '@/components/blurred-map';
+import WeatherMap from '@/components/map/local-alert';
+
 import WeatherAlerts from '@/components/weather-alert';
 import WeatherAlert from '@/modal/weather';
-import RadarMap from '@/components/map/radar';
+// import RadarMap from '@/components/map/radar';
 // import TsunamiMap from '@/components/map/tsunami';
-// import BlurredMap from '@/components/blurred-map';
-// import WeatherMap from '@/components/map/local-alert';
 
 interface DashboardPanelProps {
   alerts: WeatherAlert[];
@@ -24,11 +25,11 @@ export function DashboardPanel({
   const [currentMapIndex, setCurrentMapIndex] = useState(0);
 
   const maps = [
-    <RadarMap key="radar" />,
+    // <RadarMap key="radar" />,
     // <TsunamiMap key="tsunami" />,
-    // <BlurredMap key="blurred" isBlurred={false}>
-    //   <WeatherMap />
-    // </BlurredMap>,
+    <BlurredMap key="blurred" isBlurred={false}>
+      <WeatherMap />
+    </BlurredMap>,
   ];
 
   useEffect(() => {

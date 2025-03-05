@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 
-import WeatherAlert from '@/modal/weather';
 import { DashboardPanel } from '@/components/app/panel';
+
+import WeatherAlert from '@/modal/weather';
 
 export default function DashboardPage() {
   const [alerts, setAlerts] = useState<WeatherAlert[]>([]);

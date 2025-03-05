@@ -3,23 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { LngLatBounds, Map, Popup } from 'maplibre-gl';
 
+import WeatherAlert from '@/modal/alert';
+
 import { BaseMap } from './base';
 
 import type { Feature, GeoJsonProperties, Geometry } from 'geojson';
-
-interface WeatherAlert {
-  code: number;
-  color: string;
-  type: string;
-}
-
-const ALERTS: WeatherAlert[] = [
-  {
-    code: 711,
-    color: '#FFD700',
-    type: '大雨特報',
-  },
-];
 
 const MAP_BOUNDS = [[118.0, 21.2], [124.0, 25.8]] as [[number, number], [number, number]];
 
@@ -28,6 +16,7 @@ function WeatherMap() {
   const [isStyleLoaded, setIsStyleLoaded] = useState(false);
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
   const popupsRef = useRef<Popup[]>([]);
+  const [weatherData, setWeatherData] = useState<WeatherAlert[]>([]);
 
   const setupMap = useCallback((mapInstance: Map) => {
     const interactions = [
@@ -52,6 +41,20 @@ function WeatherMap() {
       });
     }
     setMap(mapInstance);
+  }, []);
+
+  useEffect(() => {
+    async function fetchWeatherData() {
+      const ans = await fetch('https://api-1.exptech.dev/api/v1/dpip/realtime/list');
+
+      const data = await ans.json() as WeatherAlert[];
+
+      console.log(data);
+
+      setWeatherData(data);
+    }
+
+    void fetchWeatherData();
   }, []);
 
   useEffect(() => {
