@@ -51,20 +51,9 @@ const WeatherCard: FC = () => {
 
         const station = (await response.json()) as WeatherData;
 
-        const data: WeatherData = {
-          weather: {
-            ...station.weather,
-            data: {
-              ...station.weather.data,
-              wind: {
-                ...station.weather.data.wind,
-                direction: (station.weather.data.wind.direction + 180) % 360,
-              },
-            },
-          },
-        };
+        station.weather.data.wind.direction = (station.weather.data.wind.direction + 180) % 360;
 
-        setWeatherData(data);
+        setWeatherData(station);
       }
       catch (error) {
         console.error('Error fetching weather:', error);
