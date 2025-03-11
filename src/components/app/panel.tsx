@@ -4,21 +4,10 @@ import dynamic from 'next/dynamic';
 import WeatherCard from '@/components/app/weather-header';
 import BlurredMap from '@/components/blurred-map';
 import WeatherMap from '@/components/map/local-alert';
-
-import WeatherAlerts from '@/components/weather-alert';
-import WeatherAlert from '@/modal/weather';
 // import RadarMap from '@/components/map/radar';
 // import TsunamiMap from '@/components/map/tsunami';
 
-interface DashboardPanelProps {
-  alerts: WeatherAlert[];
-  onAlertsChange: (alerts: WeatherAlert[]) => void;
-}
-
-export function DashboardPanel({
-  alerts,
-  onAlertsChange,
-}: DashboardPanelProps) {
+export function DashboardPanel() {
   const Clock = dynamic(() => import('@/components/app/clock'), {
     ssr: false,
   });
@@ -51,10 +40,6 @@ export function DashboardPanel({
         <div className="flex flex-col gap-2">
           <Clock />
           <WeatherCard />
-        </div>
-
-        <div className="mt-auto">
-          <WeatherAlerts alerts={alerts} onAlertsChange={onAlertsChange} />
         </div>
       </div>
 

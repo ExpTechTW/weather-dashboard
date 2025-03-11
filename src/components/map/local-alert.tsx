@@ -1,13 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { LngLatBounds, Map, Popup } from 'maplibre-gl';
+import { Map } from 'maplibre-gl';
 
 import WeatherAlert from '@/modal/alert';
 
 import { BaseMap } from './base';
 
-import type { Feature, GeoJsonProperties, Geometry } from 'geojson';
+// import type { Feature, GeoJsonProperties, Geometry } from 'geojson';
 
 const MAP_BOUNDS = [[118.0, 21.2], [124.0, 25.8]] as [[number, number], [number, number]];
 
@@ -15,7 +15,7 @@ function WeatherMap() {
   const [map, setMap] = useState<Map | null>(null);
   const [isStyleLoaded, setIsStyleLoaded] = useState(false);
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
-  const popupsRef = useRef<Popup[]>([]);
+  // const popupsRef = useRef<Popup[]>([]);
   const [weatherData, setWeatherData] = useState<WeatherAlert[]>([]);
 
   const setupMap = useCallback((mapInstance: Map) => {
@@ -45,17 +45,19 @@ function WeatherMap() {
 
   useEffect(() => {
     async function fetchWeatherData() {
-      const ans = await fetch('https://api-1.exptech.dev/api/v1/dpip/realtime/list');
+      const ans = await fetch('https://api-1.exptech.dev/api/v1/dpip/history/list');
 
       const data = await ans.json() as WeatherAlert[];
-
-      console.log(data);
 
       setWeatherData(data);
     }
 
     void fetchWeatherData();
   }, []);
+
+  useEffect(() => {
+    console.log(weatherData);
+  }, [weatherData]);
 
   useEffect(() => {
     if (!map || !isStyleLoaded) return;
@@ -74,91 +76,91 @@ function WeatherMap() {
    `;
     document.head.appendChild(style);
 
-    const updateAlerts = () => {
-      if (!map.isStyleLoaded()) {
-        timeoutIdRef.current = setTimeout(() => updateAlerts(), 100);
-        return;
-      }
+    // const updateAlerts = () => {
+    //   if (!map.isStyleLoaded()) {
+    //     timeoutIdRef.current = setTimeout(() => updateAlerts(), 100);
+    //     return;
+    //   }
 
-      try {
-        const colorExpression: Array<unknown> = ['case'];
-        ALERTS.forEach((alert) => {
-          colorExpression.push(['==', ['get', 'CODE'], alert.code]);
-          colorExpression.push(alert.color);
-        });
-        colorExpression.push('transparent');
+    //   try {
+    //     const colorExpression: Array<unknown> = ['case'];
+    //     // ALERTS.forEach((alert) => {
+    //     //   colorExpression.push(['==', ['get', 'CODE'], alert.code]);
+    //     //   colorExpression.push(alert.color);
+    //     // });
+    //     colorExpression.push('transparent');
 
-        map.setPaintProperty('town', 'fill-color', colorExpression);
+    //     map.setPaintProperty('town', 'fill-color', colorExpression);
 
-        popupsRef.current.forEach((popup) => popup.remove());
-        popupsRef.current = [];
+    //     popupsRef.current.forEach((popup) => popup.remove());
+    //     popupsRef.current = [];
 
-        const tainanFeatures = map.queryRenderedFeatures({
-          layers: ['county'],
-          filter: ['==', ['get', 'NAME'], '臺南市'],
-        }) as Feature<Geometry, GeoJsonProperties>[];
+    //     const tainanFeatures = map.queryRenderedFeatures({
+    //       layers: ['county'],
+    //       filter: ['==', ['get', 'NAME'], '臺南市'],
+    //     }) as Feature<Geometry, GeoJsonProperties>[];
 
-        if (tainanFeatures.length > 0) {
-          const tainanFeature = tainanFeatures[0];
-          const bounds = new LngLatBounds();
+    //     if (tainanFeatures.length > 0) {
+    //       const tainanFeature = tainanFeatures[0];
+    //       const bounds = new LngLatBounds();
 
-          if (tainanFeature.geometry.type === 'Polygon') {
-            const coordinates = tainanFeature.geometry.coordinates[0] as [number, number][];
-            coordinates.forEach((coord) => {
-              bounds.extend(coord);
-            });
-          }
+    //       if (tainanFeature.geometry.type === 'Polygon') {
+    //         const coordinates = tainanFeature.geometry.coordinates[0] as [number, number][];
+    //         coordinates.forEach((coord) => {
+    //           bounds.extend(coord);
+    //         });
+    //       }
 
-          map.fitBounds(bounds, {
-            padding: 150,
-            duration: 1000,
-          });
-        }
+    //       map.fitBounds(bounds, {
+    //         padding: 150,
+    //         duration: 1000,
+    //       });
+    //     }
 
-        ALERTS.forEach((alert) => {
-          const features = map.queryRenderedFeatures({
-            layers: ['town'],
-            filter: ['==', ['get', 'CODE'], alert.code],
-          }) as Feature<Geometry, GeoJsonProperties>[];
+    //     ALERTS.forEach((alert) => {
+    //       const features = map.queryRenderedFeatures({
+    //         layers: ['town'],
+    //         filter: ['==', ['get', 'CODE'], alert.code],
+    //       }) as Feature<Geometry, GeoJsonProperties>[];
 
-          if (features.length > 0) {
-            const alertFeature = features[0];
-            const bounds = new LngLatBounds();
+    //       if (features.length > 0) {
+    //         const alertFeature = features[0];
+    //         const bounds = new LngLatBounds();
 
-            if (alertFeature.geometry.type === 'Polygon') {
-              const coordinates = alertFeature.geometry.coordinates[0] as [number, number][];
-              coordinates.forEach((coord) => {
-                bounds.extend(coord);
-              });
-            }
+    //         if (alertFeature.geometry.type === 'Polygon') {
+    //           const coordinates = alertFeature.geometry.coordinates[0] as [number, number][];
+    //           coordinates.forEach((coord) => {
+    //             bounds.extend(coord);
+    //           });
+    //         }
 
-            const center = bounds.getCenter();
+    //         const center = bounds.getCenter();
 
-            const newPopup = new Popup({
-              closeButton: false,
-              closeOnClick: false,
-              className: 'weather-alert-popup',
-              offset: 50,
-            })
-              .setLngLat([center.lng, center.lat])
-              .setHTML(`
-               <div class="flex items-center gap-2 bg-black/80 backdrop-blur-sm border border-yellow-500/50 px-3 py-2 rounded-lg shadow-lg">
-                 <div class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
-                 <span class="text-yellow-500 font-medium tracking-wider">${alert.type}</span>
-               </div>
-             `);
+    //         const newPopup = new Popup({
+    //           closeButton: false,
+    //           closeOnClick: false,
+    //           className: 'weather-alert-popup',
+    //           offset: 50,
+    //         })
+    //           .setLngLat([center.lng, center.lat])
+    //           .setHTML(`
+    //            <div class="flex items-center gap-2 bg-black/80 backdrop-blur-sm border border-yellow-500/50 px-3 py-2 rounded-lg shadow-lg">
+    //              <div class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
+    //              <span class="text-yellow-500 font-medium tracking-wider">${alert.type}</span>
+    //            </div>
+    //          `);
 
-            newPopup.addTo(map);
-            popupsRef.current.push(newPopup);
-          }
-        });
-      }
-      catch (error) {
-        console.error('Error updating alerts:', error);
-      }
-    };
+    //         newPopup.addTo(map);
+    //         popupsRef.current.push(newPopup);
+    //       }
+    //     });
+    //   }
+    //   catch (error) {
+    //     console.error('Error updating alerts:', error);
+    //   }
+    // };
 
-    updateAlerts();
+    // updateAlerts();
 
     return () => {
       if (timeoutIdRef.current) {
