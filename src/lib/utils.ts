@@ -15,7 +15,7 @@ export const time = (t: moment.MomentInput) => moment(t).format('HH:mm:ss');
 
 export const date = (t: moment.MomentInput) => moment(t).format('yyyy年MM月DD日 dddd');
 
-export function getColor(intensity: number): string {
+export function getIntensityColor(intensity: number): string {
   switch (intensity) {
     case 0:
       return '#FFFFFF';
