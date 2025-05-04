@@ -54,6 +54,12 @@ export function SpeedEarthquakeMap() {
   const [map, setMap] = useState<Map | null>(null);
   const [isStyleLoaded, setIsStyleLoaded] = useState(false);
   const popupsRef = useRef<Popup[]>([]);
+  const [maxIntensity, setMaxIntensity] = useState(0);
+
+  useEffect(() => {
+    const maxIntensity = data2.reduce((max, item) => Math.max(max, item.max), 0);
+    setMaxIntensity(maxIntensity);
+  }, []);
 
   const setupMap = useCallback((mapInstance: Map) => {
     const interactions = [
@@ -136,6 +142,25 @@ export function SpeedEarthquakeMap() {
         `}
         >
           <span className="text-xl font-bold text-white">震度速報</span>
+        </div>
+      </div>
+      <div className={`
+        absolute right-2 top-2 flex flex-col space-y-2
+        lg:right-4 lg:top-4
+      `}
+      >
+        <div className="rounded-lg bg-white/10 p-2">
+          <div className="flex items-center">
+            <div className={`
+              flex h-10 w-10 items-center justify-center rounded-lg bg-green-600
+            `}
+            >
+              <span className="text-2xl font-bold text-white">{maxIntensity}</span>
+            </div>
+            <div className="px-2">
+              <span className="text-lg font-bold text-white">目前最大震度</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
