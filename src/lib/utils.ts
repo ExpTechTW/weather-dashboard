@@ -18,22 +18,22 @@ export const date = (t: moment.MomentInput) => moment(t).format('yyyy年MM月DD�
 export function getIntensityColor(intensity: number): string {
   switch (intensity) {
     case 0:
-      return '#FFFFFF';
+      return '#79E5FD';
     case 1:
-      return '#D4F2D2';
+      return '#49E9AD';
     case 2:
-      return '#7BEA7B';
+      return '#44fa34';
     case 3:
-      return '#FFFF00';
+      return '#beff0c';
     case 4:
-      return '#FFA500';
+      return '#fff000';
     case 5:
-      return '#FF0000';
+      return '#ff9300';
     case 6:
-      return '#800000';
+      return '#fc5235';
     case 7:
-      return '#FF00FF';
+      return '#b720e9';
     default:
-      return '#FFFFFF';
+      return '#79E5FD';
   }
 }

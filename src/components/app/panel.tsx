@@ -6,7 +6,7 @@ import BlurredMap from '@/components/blurred-map';
 import WeatherMap from '@/components/map/local-alert';
 import RadarMap from '@/components/map/radar';
 // import TsunamiMap from '@/components/map/tsunami';
-import SpeedEarthquakeMap from '@/components/map/rts';
+import IntensityMap from '@/components/map/intensity';
 
 export function DashboardPanel() {
   const Clock = dynamic(() => import('@/components/app/clock'), {
@@ -20,7 +20,7 @@ export function DashboardPanel() {
     // <BlurredMap key="blurred" isBlurred={false}>
     //   <WeatherMap />
     // </BlurredMap>,
-    <SpeedEarthquakeMap key="speed-earthquake" />,
+    <IntensityMap key="intensity" />,
   ];
 
   useEffect(() => {
