@@ -27,6 +27,29 @@ const data = {
   },
 };
 
+const data2 = [
+  {
+    type: 'intensity',
+    author: 'trem',
+    id: 1746281386215,
+    alert: 0,
+    serial: 1,
+    final: 0,
+    area: {
+      1: [
+        970,
+        971,
+        973,
+      ],
+      2: [
+        270,
+        272,
+      ],
+    },
+    max: 2,
+  },
+];
+
 export function SpeedEarthquakeMap() {
   const [map, setMap] = useState<Map | null>(null);
   const [isStyleLoaded, setIsStyleLoaded] = useState(false);
@@ -99,7 +122,23 @@ export function SpeedEarthquakeMap() {
   }, [map, isStyleLoaded]);
 
   return (
-    <BaseMap onMapLoaded={setupMap} />
+    <div className="relative h-full w-full">
+      <BaseMap onMapLoaded={setupMap} />
+      <div className={`
+        absolute left-2 top-2 flex flex-col space-y-2
+        lg:left-4 lg:top-4
+      `}
+      >
+        <div className={`
+          inline-flex w-fit items-center gap-1 rounded-lg bg-white/10 px-2
+          py-1.5 shadow-lg backdrop-blur-md
+          lg:gap-2 lg:px-3 lg:py-2
+        `}
+        >
+          <span className="text-xl font-bold text-white">震度速報</span>
+        </div>
+      </div>
+    </div>
   );
 }
 
