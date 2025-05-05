@@ -41,10 +41,21 @@ export function IntensityMap() {
   const [map, setMap] = useState<Map | null>(null);
   const [isStyleLoaded, setIsStyleLoaded] = useState(false);
   const popupsRef = useRef<Popup[]>([]);
-  const [maxIntensity, setMaxIntensity] = useState(0);
   const [region, setRegion] = useState<RegionData>({});
   const [intensityData, setIntensityData] = useState<IntensityDataType[]>([]);
-  let tesnumber = 1737389859000;
+  const [currentDataIndex, setCurrentDataIndex] = useState(0);
+  let tesnumber = 1737390008000; // 1737389859000;
+
+  useEffect(() => {
+    if (intensityData.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentDataIndex((prevIndex) => (prevIndex + 1) % intensityData.length);
+      }, 2000);
+      return () => clearInterval(interval);
+    }
+  }, [intensityData.length]);
+
+  const currentData = intensityData[currentDataIndex] || intensityData[0];
 
   const zoomToMaxIntensityArea = useCallback(() => {
     if (!map || !isStyleLoaded || !intensityData.length) return;
@@ -96,11 +107,6 @@ export function IntensityMap() {
       });
     }
   }, [map, isStyleLoaded, intensityData]);
-
-  useEffect(() => {
-    const maxIntensity = intensityData.reduce((max: number, item: IntensityDataType) => Math.max(max, item.max), 0);
-    setMaxIntensity(maxIntensity);
-  }, [intensityData]);
 
   const setupMap = useCallback((mapInstance: Map) => {
     async function fetchIntensityData() {
@@ -214,26 +220,46 @@ export function IntensityMap() {
         >
           <span className="text-xl font-bold text-white">震度速報</span>
         </div>
+        <div>
+          <div className={`
+            rounded-lg bg-gray-700 p-2 font-bold text-white
+            ${currentData
+      ? ''
+      : `hidden`}
+          `}
+          >
+            {currentData ? `ID:${currentData.id}` : ''}
+          </div>
+        </div>
       </div>
       <div className={`
         absolute right-2 top-2 flex flex-col space-y-2
-        ${intensityData.length > 0
-      ? ''
-      : `hidden`}
+        ${currentData ? '' : 'hidden'}
         lg:right-4 lg:top-4
       `}
       >
         <div className="rounded-lg bg-gray-700 p-2">
-          <div className="flex items-center">
+          {intensityData.length > 0 && (
+            <div className="flex items-center justify-center">
+              <div className="text-2xl font-bold text-white">
+                {currentData.final === 1
+                  ? '最終報'
+                  : `第 ${currentData.serial} 報`}
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="rounded-lg bg-gray-700 p-2">
+          <div>
             {intensityData.length > 0 && (
               <div className="flex items-center gap-2">
                 <div
                   className={`
                     flex h-10 w-10 items-center justify-center rounded-lg
                   `}
-                  style={{ backgroundColor: getIntensityColor(maxIntensity) }}
+                  style={{ backgroundColor: getIntensityColor(currentData.max) }}
                 >
-                  <span className="text-2xl font-bold text-black">{maxIntensity}</span>
+                  <span className="text-2xl font-bold text-black">{currentData.max}</span>
                 </div>
                 <div className="px-2">
                   <span className="text-lg font-bold text-white">目前最大震度</span>
@@ -243,64 +269,81 @@ export function IntensityMap() {
           </div>
         </div>
         <div className="mt-2 flex flex-col gap-2">
-          {intensityData.map((i: IntensityDataType) => {
+          {currentData && (() => {
             const cityMaxIntensity: { [key: string]: number } = {};
-
-            Object.entries(i.area).forEach(([intensity, codes]) => {
+            Object.entries(currentData.area).forEach(([intensity, codes]) => {
               const currentIntensity = parseInt(intensity);
               codes.forEach((code) => {
+                let location = '';
                 for (const [city, districts] of Object.entries(region)) {
                   for (const [, info] of Object.entries(districts)) {
                     if (info.code === code) {
-                      if (!cityMaxIntensity[city] || cityMaxIntensity[city] < currentIntensity) {
-                        cityMaxIntensity[city] = currentIntensity;
-                      }
+                      location = city;
                       break;
                     }
+                  }
+                  if (location) break;
+                }
+                if (location) {
+                  if (!cityMaxIntensity[location] || cityMaxIntensity[location] < currentIntensity) {
+                    cityMaxIntensity[location] = currentIntensity;
                   }
                 }
               });
             });
-
-            const intensityGroups: { [key: number]: string[] } = {};
-            Object.entries(cityMaxIntensity).forEach(([city, maxIntensity]) => {
-              if (!intensityGroups[maxIntensity]) {
-                intensityGroups[maxIntensity] = [];
-              }
-              intensityGroups[maxIntensity].push(city);
-            });
-
-            return Object.entries(intensityGroups)
+            return Object.entries(currentData.area)
               .sort(([a], [b]) => parseInt(b) - parseInt(a))
-              .map(([intensity, cities]) => (
-                <div key={intensity} className="rounded-lg bg-gray-700 p-2">
-                  <div className="text-white">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={`
-                          flex h-7 w-7 items-center justify-center rounded-sm
-                        `}
-                        style={{ backgroundColor: getIntensityColor(parseInt(intensity)) }}
-                      >
-                        <span className="text-2xl font-bold text-black">{intensity}</span>
+              .map(([intensity, codes]) => {
+                const currentIntensity = parseInt(intensity);
+                const citiesInThisIntensity = new Set<string>();
+                codes.forEach((code) => {
+                  let location = '';
+                  for (const [city, districts] of Object.entries(region)) {
+                    for (const [, info] of Object.entries(districts)) {
+                      if (info.code === code) {
+                        location = city;
+                        break;
+                      }
+                    }
+                    if (location) break;
+                  }
+                  if (location && cityMaxIntensity[location] === currentIntensity) {
+                    citiesInThisIntensity.add(location);
+                  }
+                });
+
+                if (citiesInThisIntensity.size === 0) return null;
+
+                return (
+                  <div key={intensity} className="rounded-lg bg-gray-700 p-2">
+                    <div className="text-white">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className={`
+                            flex h-7 w-7 items-center justify-center rounded-sm
+                          `}
+                          style={{ backgroundColor: getIntensityColor(currentIntensity) }}
+                        >
+                          <span className="text-2xl font-bold text-black">{intensity}</span>
+                        </div>
+                        <div className="font-bold">
+                          最大震度縣市
+                        </div>
                       </div>
-                      <div className="font-bold">
-                        最大震度縣市
-                      </div>
-                    </div>
-                    <div className="mx-9 mt-1">
-                      <div className="grid grid-cols-2">
-                        {cities.sort().map((city) => (
-                          <div key={city} className="text-sm">
-                            {city}
-                          </div>
-                        ))}
+                      <div className="mx-9 mt-1">
+                        <div className="grid grid-cols-2">
+                          {Array.from(citiesInThisIntensity).sort().map((city) => (
+                            <div key={city} className="text-sm">
+                              {city}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ));
-          })}
+                );
+              }).filter(Boolean);
+          })()}
         </div>
       </div>
       <div className={`
