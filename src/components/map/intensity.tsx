@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { LngLatBounds, Map, Popup } from 'maplibre-gl';
 
 import { BaseMap } from '@/components/map/base';
-import { getIntensityColor } from '@/lib/utils';
+import { getIntensityColor, getIntensityText } from '@/lib/utils';
 import IntensityColors from '@/components/intensity-colors';
 
 const MAP_BOUNDS = [[118.0, 21.2], [124.0, 25.8]] as [[number, number], [number, number]];
@@ -44,7 +44,7 @@ export function IntensityMap() {
   const [region, setRegion] = useState<RegionData>({});
   const [intensityData, setIntensityData] = useState<IntensityDataType[]>([]);
   const [currentDataIndex, setCurrentDataIndex] = useState(0);
-  let tesnumber = 1737390008000; // 1737389859000;
+  let tesnumber = 1746442420000; // 1737390008000;  1737389859000;
 
   useEffect(() => {
     if (intensityData.length > 1) {
@@ -259,9 +259,9 @@ export function IntensityMap() {
                   `}
                   style={{ backgroundColor: getIntensityColor(currentData.max) }}
                 >
-                  <span className="text-2xl font-bold text-black">{currentData.max}</span>
+                  <span className="text-2xl font-bold text-black">{getIntensityText(currentData.max)}</span>
                 </div>
-                <div className="px-2">
+                <div className="px-1">
                   <span className="text-lg font-bold text-white">目前最大震度</span>
                 </div>
               </div>
@@ -320,13 +320,14 @@ export function IntensityMap() {
                       <div className="flex items-center gap-2">
                         <div
                           className={`
-                            flex h-7 w-7 items-center justify-center rounded-sm
+                            flex h-10 w-10 items-center justify-center
+                            rounded-sm
                           `}
                           style={{ backgroundColor: getIntensityColor(currentIntensity) }}
                         >
-                          <span className="text-2xl font-bold text-black">{intensity}</span>
+                          <span className="text-2xl font-bold text-black">{getIntensityText(currentIntensity)}</span>
                         </div>
-                        <div className="font-bold">
+                        <div className="px-1 text-lg font-bold">
                           最大震度縣市
                         </div>
                       </div>
