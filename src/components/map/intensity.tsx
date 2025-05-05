@@ -157,6 +157,7 @@ export function IntensityMap() {
 
     if (intensityData.length === 0) {
       map.setPaintProperty('town', 'fill-color', 'transparent');
+      map.setPaintProperty('town', 'fill-outline-color', 'transparent');
       map.fitBounds(MAP_BOUNDS, {
         padding: 20,
         duration: 1000,
@@ -165,7 +166,8 @@ export function IntensityMap() {
     }
     else {
       const colorExpression: Array<unknown> = ['case'];
-      Object.entries(intensityData[0].area).forEach(([intensity, codes]: [string, number[]]) => {
+      const outlineExpression: Array<unknown> = ['case'];
+      Object.entries(intensityData[0].area).forEach(([intensity, codes]) => {
         const intensityColor = getIntensityColor(parseInt(intensity));
         codes.forEach((code: number) => {
           const areaData: AreaData = {
@@ -174,10 +176,14 @@ export function IntensityMap() {
           };
           colorExpression.push(['==', ['get', 'CODE'], areaData.code]);
           colorExpression.push(areaData.color);
+          outlineExpression.push(['==', ['get', 'CODE'], areaData.code]);
+          outlineExpression.push('#000000');
         });
       });
       colorExpression.push('transparent');
+      outlineExpression.push('transparent');
       map.setPaintProperty('town', 'fill-color', colorExpression);
+      map.setPaintProperty('town', 'fill-outline-color', outlineExpression);
 
       setTimeout(() => {
         zoomToMaxIntensityArea();
@@ -237,10 +243,36 @@ export function IntensityMap() {
           </div>
         </div>
         <div className="mt-2 flex flex-col gap-2">
-          {intensityData.map((i: IntensityDataType) => (
-            Object.entries(i.area)
+          {intensityData.map((i: IntensityDataType) => {
+            const cityMaxIntensity: { [key: string]: number } = {};
+
+            Object.entries(i.area).forEach(([intensity, codes]) => {
+              const currentIntensity = parseInt(intensity);
+              codes.forEach((code) => {
+                for (const [city, districts] of Object.entries(region)) {
+                  for (const [, info] of Object.entries(districts)) {
+                    if (info.code === code) {
+                      if (!cityMaxIntensity[city] || cityMaxIntensity[city] < currentIntensity) {
+                        cityMaxIntensity[city] = currentIntensity;
+                      }
+                      break;
+                    }
+                  }
+                }
+              });
+            });
+
+            const intensityGroups: { [key: number]: string[] } = {};
+            Object.entries(cityMaxIntensity).forEach(([city, maxIntensity]) => {
+              if (!intensityGroups[maxIntensity]) {
+                intensityGroups[maxIntensity] = [];
+              }
+              intensityGroups[maxIntensity].push(city);
+            });
+
+            return Object.entries(intensityGroups)
               .sort(([a], [b]) => parseInt(b) - parseInt(a))
-              .map(([intensity, codes]: [string, number[]]) => (
+              .map(([intensity, cities]) => (
                 <div key={intensity} className="rounded-lg bg-gray-700 p-2">
                   <div className="text-white">
                     <div className="flex items-center gap-2">
@@ -253,35 +285,22 @@ export function IntensityMap() {
                         <span className="text-2xl font-bold text-black">{intensity}</span>
                       </div>
                       <div className="font-bold">
-                        震度
-                      </div>
-                      <div className="text-xs font-bold">
-                        {`( ${codes.length} )`}
+                        最大震度縣市
                       </div>
                     </div>
-                    <div className="ml-2">
-                      {codes.map((code) => {
-                        let location = '';
-                        for (const [city, districts] of Object.entries(region)) {
-                          for (const [district, info] of Object.entries(districts)) {
-                            if (info.code === code) {
-                              location = `${city} ${district}`;
-                              break;
-                            }
-                          }
-                          if (location) break;
-                        }
-                        return (
-                          <div key={code} className="text-sm">
-                            {location || code}
+                    <div className="mx-9 mt-1">
+                      <div className="grid grid-cols-2">
+                        {cities.sort().map((city) => (
+                          <div key={city} className="text-sm">
+                            {city}
                           </div>
-                        );
-                      })}
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
-              ))
-          ))}
+              ));
+          })}
         </div>
       </div>
       <div className={`
