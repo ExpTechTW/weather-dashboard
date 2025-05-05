@@ -6,7 +6,6 @@ import { getIntensityColor } from '@/lib/utils';
 import IntensityColors from '@/components/intensity-colors';
 
 const MAP_BOUNDS = [[118.0, 21.2], [124.0, 25.8]] as [[number, number], [number, number]];
-
 interface AreaData {
   code: number;
   color: string;
@@ -43,13 +42,12 @@ export function IntensityMap() {
   const [isStyleLoaded, setIsStyleLoaded] = useState(false);
   const popupsRef = useRef<Popup[]>([]);
   const [maxIntensity, setMaxIntensity] = useState(0);
-  const hasZoomedRef = useRef(false);
   const [region, setRegion] = useState<RegionData>({});
   const [intensityData, setIntensityData] = useState<IntensityDataType[]>([]);
-  const [tesnumber, setTesnumber] = useState(1746281445527);
+  let tesnumber = 1737389859000;
 
   const zoomToMaxIntensityArea = useCallback(() => {
-    if (!map || !isStyleLoaded || !intensityData.length || hasZoomedRef.current) return;
+    if (!map || !isStyleLoaded || !intensityData.length) return;
 
     try {
       const bounds = new LngLatBounds();
@@ -77,13 +75,25 @@ export function IntensityMap() {
       if (hasValidFeatures) {
         map.fitBounds(bounds, {
           padding: 150,
-          duration: 1500,
+          duration: 1000,
+          maxZoom: 9,
         });
-        hasZoomedRef.current = true;
+      }
+      else {
+        map.fitBounds(MAP_BOUNDS, {
+          padding: 20,
+          duration: 1000,
+          maxZoom: 9,
+        });
       }
     }
     catch (error) {
       console.log(error);
+      map.fitBounds(MAP_BOUNDS, {
+        padding: 20,
+        duration: 1000,
+        maxZoom: 9,
+      });
     }
   }, [map, isStyleLoaded, intensityData]);
 
@@ -93,6 +103,13 @@ export function IntensityMap() {
   }, [intensityData]);
 
   const setupMap = useCallback((mapInstance: Map) => {
+    async function fetchIntensityData() {
+      const data = await fetch(`https://api.exptech.dev/api/v1/trem/intensity/${tesnumber}`);
+      const json = await data.json() as IntensityDataType[];
+      setIntensityData(json);
+      tesnumber += 1000;
+    }
+
     const interactions = [
       mapInstance.dragRotate,
       mapInstance.dragPan,
@@ -118,22 +135,17 @@ export function IntensityMap() {
     }
 
     setMap(mapInstance);
+    void fetchIntensityData();
+
+    setInterval(() => {
+      void fetchIntensityData();
+    }, 1000);
 
     void fetch('https://raw.githubusercontent.com/ExpTechTW/TREM-Lite/aed715aab833dcdf6c983d4d1310a35a81b5653d/src/resource/data/region.json')
       .then((res) => res.json())
       .then((data: RegionData) => {
         setRegion(data);
       });
-    console.log(123);
-
-    setInterval(() => {
-      void (async () => {
-        const data = await fetch(`https://api.exptech.dev/api/v1/trem/intensity/${tesnumber}`);
-        const json = await data.json() as IntensityDataType[];
-        setIntensityData(json);
-        setTesnumber(tesnumber + 1000);
-      })();
-    }, 1000);
   }, []);
 
   useEffect(() => {
@@ -143,8 +155,16 @@ export function IntensityMap() {
     style.textContent = ``;
     document.head.appendChild(style);
 
-    const colorExpression: Array<unknown> = ['case'];
-    if (intensityData.length > 0) {
+    if (intensityData.length === 0) {
+      map.setPaintProperty('town', 'fill-color', 'transparent');
+      map.fitBounds(MAP_BOUNDS, {
+        padding: 20,
+        duration: 1000,
+        maxZoom: 9,
+      });
+    }
+    else {
+      const colorExpression: Array<unknown> = ['case'];
       Object.entries(intensityData[0].area).forEach(([intensity, codes]: [string, number[]]) => {
         const intensityColor = getIntensityColor(parseInt(intensity));
         codes.forEach((code: number) => {
@@ -156,14 +176,13 @@ export function IntensityMap() {
           colorExpression.push(areaData.color);
         });
       });
+      colorExpression.push('transparent');
+      map.setPaintProperty('town', 'fill-color', colorExpression);
+
+      setTimeout(() => {
+        zoomToMaxIntensityArea();
+      }, 500);
     }
-    colorExpression.push('transparent');
-
-    map.setPaintProperty('town', 'fill-color', colorExpression);
-
-    setTimeout(() => {
-      zoomToMaxIntensityArea();
-    }, 1000);
 
     popupsRef.current.forEach((popup) => popup.remove());
     popupsRef.current = [];
@@ -182,7 +201,7 @@ export function IntensityMap() {
       `}
       >
         <div className={`
-          inline-flex w-fit items-center gap-1 rounded-lg bg-white/10 px-2
+          inline-flex w-fit items-center gap-1 rounded-lg bg-gray-700 px-2
           py-1.5 shadow-lg backdrop-blur-md
           lg:gap-2 lg:px-3 lg:py-2
         `}
@@ -192,10 +211,13 @@ export function IntensityMap() {
       </div>
       <div className={`
         absolute right-2 top-2 flex flex-col space-y-2
+        ${intensityData.length > 0
+      ? ''
+      : `hidden`}
         lg:right-4 lg:top-4
       `}
       >
-        <div className="rounded-lg bg-white/10 p-2">
+        <div className="rounded-lg bg-gray-700 p-2">
           <div className="flex items-center">
             {intensityData.length > 0 && (
               <div className="flex items-center gap-2">
@@ -219,7 +241,7 @@ export function IntensityMap() {
             Object.entries(i.area)
               .sort(([a], [b]) => parseInt(b) - parseInt(a))
               .map(([intensity, codes]: [string, number[]]) => (
-                <div key={intensity} className="rounded-lg bg-white/10 p-2">
+                <div key={intensity} className="rounded-lg bg-gray-700 p-2">
                   <div className="text-white">
                     <div className="flex items-center gap-2">
                       <div
@@ -232,6 +254,9 @@ export function IntensityMap() {
                       </div>
                       <div className="font-bold">
                         震度
+                      </div>
+                      <div className="text-xs font-bold">
+                        {`( ${codes.length} )`}
                       </div>
                     </div>
                     <div className="ml-2">
