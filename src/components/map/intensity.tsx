@@ -4,38 +4,9 @@ import { LngLatBounds, Map, Popup } from 'maplibre-gl';
 import { BaseMap } from '@/components/map/base';
 import { getIntensityColor, getIntensityText } from '@/lib/utils';
 import IntensityColors from '@/components/intensity-colors';
+import { AreaData, IntensityDataType, RegionData } from '@/modal/intensity';
 
 const MAP_BOUNDS = [[118.0, 21.2], [124.0, 25.8]] as [[number, number], [number, number]];
-interface AreaData {
-  code: number;
-  color: string;
-}
-
-interface IntensityDataType {
-  type: string;
-  author: string;
-  id: number;
-  alert: number;
-  serial: number;
-  final: number;
-  area: {
-    [key: string]: number[];
-  };
-  max: number;
-}
-interface RegionInfo {
-  code: number;
-  lat?: number;
-  lon?: number;
-  site?: number;
-  area?: string;
-}
-
-interface RegionData {
-  [city: string]: {
-    [district: string]: RegionInfo;
-  };
-}
 
 export function IntensityMap() {
   const [map, setMap] = useState<Map | null>(null);
@@ -44,7 +15,7 @@ export function IntensityMap() {
   const [region, setRegion] = useState<RegionData>({});
   const [intensityData, setIntensityData] = useState<IntensityDataType[]>([]);
   const [currentDataIndex, setCurrentDataIndex] = useState(0);
-  let tesnumber = 1746442420000; // 1737390008000;  1737389859000;
+  const lastDataRef = useRef<string>('');
 
   useEffect(() => {
     if (intensityData.length > 1) {
@@ -110,10 +81,19 @@ export function IntensityMap() {
 
   const setupMap = useCallback((mapInstance: Map) => {
     async function fetchIntensityData() {
-      const data = await fetch(`https://api.exptech.dev/api/v1/trem/intensity/${tesnumber}`);
-      const json = await data.json() as IntensityDataType[];
-      setIntensityData(json);
-      tesnumber += 1000;
+      try {
+        const data = await fetch(`https://api.exptech.dev/api/v1/trem/intensity`);
+        const json = await data.json() as IntensityDataType[];
+
+        const newDataString = JSON.stringify(json);
+        if (newDataString !== lastDataRef.current) {
+          lastDataRef.current = newDataString;
+          setIntensityData(json);
+        }
+      }
+      catch (error) {
+        console.error(error);
+      }
     }
 
     const interactions = [
@@ -143,7 +123,7 @@ export function IntensityMap() {
     setMap(mapInstance);
     void fetchIntensityData();
 
-    setInterval(() => {
+    const fetchInterval = setInterval(() => {
       void fetchIntensityData();
     }, 1000);
 
@@ -152,6 +132,10 @@ export function IntensityMap() {
       .then((data: RegionData) => {
         setRegion(data);
       });
+
+    return () => {
+      clearInterval(fetchInterval);
+    };
   }, []);
 
   useEffect(() => {
@@ -353,6 +337,17 @@ export function IntensityMap() {
       `}
       >
         <IntensityColors />
+      </div>
+      <div>
+        <div className={`
+          absolute bottom-2 left-2 flex flex-col space-y-2
+          lg:bottom-4 lg:left-4
+        `}
+        >
+          <div className="rounded-lg bg-gray-700 bg-opacity-80 px-2 py-1">
+            <span className="text-sm text-white">僅供參考，以中央氣象署發布之內容為準</span>
+          </div>
+        </div>
       </div>
     </div>
   );
