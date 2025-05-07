@@ -142,7 +142,7 @@ function WeatherMap() {
           duration: 1000,
         });
       }
-      catch (error) { 
+      catch (error) {
         console.error('Error updating alerts:', error);
       }
     };
