@@ -16,14 +16,23 @@ export function IntensityMap() {
   const [intensityData, setIntensityData] = useState<IntensityDataType[]>([]);
   const [currentDataIndex, setCurrentDataIndex] = useState(0);
   const lastDataRef = useRef<string>('');
+  const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const fetchIntervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   useEffect(() => {
     if (intensityData.length > 1) {
-      const interval = setInterval(() => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      intervalRef.current = setInterval(() => {
         setCurrentDataIndex((prevIndex) => (prevIndex + 1) % intensityData.length);
       }, 2000);
-      return () => clearInterval(interval);
     }
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
   }, [intensityData.length]);
 
   const currentData = intensityData[currentDataIndex] || intensityData[0];
@@ -35,6 +44,7 @@ export function IntensityMap() {
       const bounds = new LngLatBounds();
       let hasValidFeatures = false;
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       Object.entries(intensityData[0].area).forEach(([_, codes]) => {
         codes.forEach((code: number) => {
           const features = map.queryRenderedFeatures({
@@ -123,7 +133,12 @@ export function IntensityMap() {
     setMap(mapInstance);
     void fetchIntensityData();
 
-    const fetchInterval = setInterval(() => {
+    // Clear any existing fetch interval
+    if (fetchIntervalRef.current) {
+      clearInterval(fetchIntervalRef.current);
+    }
+
+    fetchIntervalRef.current = setInterval(() => {
       void fetchIntensityData();
     }, 1000);
 
@@ -134,7 +149,9 @@ export function IntensityMap() {
       });
 
     return () => {
-      clearInterval(fetchInterval);
+      if (fetchIntervalRef.current) {
+        clearInterval(fetchIntervalRef.current);
+      }
     };
   }, []);
 
@@ -188,9 +205,20 @@ export function IntensityMap() {
     };
   }, [map, isStyleLoaded, zoomToMaxIntensityArea, intensityData]);
 
+  const handleCleanup = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = undefined;
+    }
+    if (fetchIntervalRef.current) {
+      clearInterval(fetchIntervalRef.current);
+      fetchIntervalRef.current = undefined;
+    }
+  }, []);
+
   return (
     <div className="relative h-full w-full">
-      <BaseMap onMapLoaded={setupMap} />
+      <BaseMap onMapLoaded={setupMap} onCleanup={handleCleanup} />
       <div className={`
         absolute left-2 top-2 flex flex-col space-y-2
         lg:left-4 lg:top-4
