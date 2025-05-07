@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { Map } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-export function BaseMap({ onMapLoaded }: { onMapLoaded?: (map: Map) => void }) {
+export function BaseMap({ onMapLoaded, onCleanup }: { onMapLoaded?: (map: Map) => void; onCleanup?: () => void }) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | null>(null);
 
@@ -68,8 +68,11 @@ export function BaseMap({ onMapLoaded }: { onMapLoaded?: (map: Map) => void }) {
 
     map.on('error', () => void 0);
 
-    return () => map.remove();
-  }, [onMapLoaded]);
+    return () => {
+      if (onCleanup) onCleanup();
+      map.remove();
+    };
+  }, [onMapLoaded, onCleanup]);
 
   return <div ref={mapContainerRef} className="h-full w-full" />;
 }
