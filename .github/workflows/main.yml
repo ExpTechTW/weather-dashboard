@@ -49,6 +49,6 @@ jobs:
         username: exptech
         password: ${{ secrets.PASSWORD }}
         script: |
-          cd /home/yuyu1015/weather-dashboard
+          cd /home/exptech/weather-dashboard
           git pull
           docker compose up -d --build weather-dashboard-dev
