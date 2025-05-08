@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 
 import WeatherCard from '@/components/app/weather-header';
-import BlurredMap from '@/components/blurred-map';
-import WeatherMap from '@/components/map/local-alert';
-import RadarMap from '@/components/map/radar';
+// import BlurredMap from '@/components/blurred-map';
+// import WeatherMap from '@/components/map/local-alert';
+// import RadarMap from '@/components/map/radar';
 // import TsunamiMap from '@/components/map/tsunami';
 import IntensityMap from '@/components/map/intensity';
 
