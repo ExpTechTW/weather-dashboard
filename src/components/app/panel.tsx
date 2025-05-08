@@ -4,8 +4,9 @@ import dynamic from 'next/dynamic';
 import WeatherCard from '@/components/app/weather-header';
 import BlurredMap from '@/components/blurred-map';
 import WeatherMap from '@/components/map/local-alert';
-// import RadarMap from '@/components/map/radar';
+import RadarMap from '@/components/map/radar';
 // import TsunamiMap from '@/components/map/tsunami';
+import IntensityMap from '@/components/map/intensity';
 
 export function DashboardPanel() {
   const Clock = dynamic(() => import('@/components/app/clock'), {
@@ -16,9 +17,10 @@ export function DashboardPanel() {
   const maps = [
     // <RadarMap key="radar" />,
     // <TsunamiMap key="tsunami" />,
-    <BlurredMap key="blurred" isBlurred={false}>
-      <WeatherMap />
-    </BlurredMap>,
+    // <BlurredMap key="blurred" isBlurred={false}>
+    //   <WeatherMap />
+    // </BlurredMap>,
+    <IntensityMap key="intensity" />,
   ];
 
   useEffect(() => {
