@@ -15,30 +15,57 @@ export const time = (t: moment.MomentInput) => moment(t).format('HH:mm:ss');
 
 export const date = (t: moment.MomentInput) => moment(t).format('yyyy年MM月DD日 dddd');
 
-export function getIntensityColor(intensity: number): string {
+export function getIntensityColorBg(intensity: number): string {
   switch (intensity) {
     case 0:
-      return '#79E5FD';
+      return '#202020';
     case 1:
-      return '#49E9AD';
+      return '#003264';
     case 2:
-      return '#44fa34';
+      return '#0064c8';
     case 3:
-      return '#beff0c';
+      return '#1e9632';
     case 4:
-      return '#fff000';
+      return '#ffc800';
     case 5:
-      return '#ff9300';
+      return '#ff9600';
     case 6:
-      return '#fc5235';
+      return '#ff6400';
     case 7:
-      return '#b720e9';
-    case 8:
-      return '#800080';
-    case 9:
       return '#ff0000';
+    case 8:
+      return '#c00000';
+    case 9:
+      return '#9600c8';
     default:
-      return '#79E5FD';
+      return '#202020';
+  }
+}
+
+export function getIntensityColorText(intensity: number): string {
+  switch (intensity) {
+    case 0:
+      return '#ffffff';
+    case 1:
+      return '#ffffff';
+    case 2:
+      return '#ffffff';
+    case 3:
+      return '#ffffff';
+    case 4:
+      return '#000000';
+    case 5:
+      return '#000000';
+    case 6:
+      return '#000000';
+    case 7:
+      return '#ffffff';
+    case 8:
+      return '#ffffff';
+    case 9:
+      return '#ffffff';
+    default:
+      return '#ffffff';
   }
 }
 

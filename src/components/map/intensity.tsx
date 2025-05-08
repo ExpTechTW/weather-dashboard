@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { LngLatBounds, Map, Popup } from 'maplibre-gl';
 
 import { BaseMap } from '@/components/map/base';
-import { getIntensityColor, getIntensityText } from '@/lib/utils';
+import { getIntensityColorBg, getIntensityColorText, getIntensityText } from '@/lib/utils';
 import IntensityColors from '@/components/intensity-colors';
 import { AreaData, IntensityDataType, RegionData } from '@/modal/intensity';
 
@@ -174,7 +174,7 @@ export function IntensityMap() {
       const colorExpression: Array<unknown> = ['case'];
       const outlineExpression: Array<unknown> = ['case'];
       Object.entries(intensityData[0].area).forEach(([intensity, codes]) => {
-        const intensityColor = getIntensityColor(parseInt(intensity));
+        const intensityColor = getIntensityColorBg(parseInt(intensity));
         codes.forEach((code: number) => {
           const areaData: AreaData = {
             code,
@@ -268,9 +268,14 @@ export function IntensityMap() {
                   className={`
                     flex h-10 w-10 items-center justify-center rounded-lg
                   `}
-                  style={{ backgroundColor: getIntensityColor(currentData.max) }}
+                  style={{ backgroundColor: getIntensityColorBg(currentData.max) }}
                 >
-                  <span className="text-2xl font-bold text-black">{getIntensityText(currentData.max)}</span>
+                  <span
+                    className="text-2xl font-bold"
+                    style={{ color: getIntensityColorText(currentData.max) }}
+                  >
+                    {getIntensityText(currentData.max)}
+                  </span>
                 </div>
                 <div className="px-1">
                   <span className="text-lg font-bold text-white">目前最大震度</span>
@@ -334,9 +339,14 @@ export function IntensityMap() {
                             flex h-10 w-10 items-center justify-center
                             rounded-sm
                           `}
-                          style={{ backgroundColor: getIntensityColor(currentIntensity) }}
+                          style={{ backgroundColor: getIntensityColorBg(currentIntensity) }}
                         >
-                          <span className="text-2xl font-bold text-black">{getIntensityText(currentIntensity)}</span>
+                          <span
+                            className="text-2xl font-bold"
+                            style={{ color: getIntensityColorText(currentIntensity) }}
+                          >
+                            {getIntensityText(currentIntensity)}
+                          </span>
                         </div>
                         <div className="px-1 text-lg font-bold">
                           最大震度縣市
