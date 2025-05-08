@@ -133,7 +133,6 @@ export function IntensityMap() {
     setMap(mapInstance);
     void fetchIntensityData();
 
-    // Clear any existing fetch interval
     if (fetchIntervalRef.current) {
       clearInterval(fetchIntervalRef.current);
     }
