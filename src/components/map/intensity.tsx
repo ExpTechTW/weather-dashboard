@@ -44,8 +44,8 @@ export function IntensityMap() {
       const bounds = new LngLatBounds();
       let hasValidFeatures = false;
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       Object.entries(intensityData[0].area).forEach(([_, codes]) => {
+        console.log(_, codes);
         codes.forEach((code: number) => {
           const features = map.queryRenderedFeatures({
             layers: ['town'],
@@ -219,8 +219,8 @@ export function IntensityMap() {
     <div className="relative h-full w-full">
       <BaseMap onMapLoaded={setupMap} onCleanup={handleCleanup} />
       <div className={`
-        absolute left-2 top-2 flex flex-col space-y-2
-        lg:left-4 lg:top-4
+        absolute top-2 left-2 flex flex-col space-y-2
+        lg:top-4 lg:left-4
       `}
       >
         <div className={`
@@ -244,9 +244,9 @@ export function IntensityMap() {
         </div>
       </div>
       <div className={`
-        absolute right-2 top-2 flex flex-col space-y-2
+        absolute top-2 right-2 flex flex-col space-y-2
         ${currentData ? '' : 'hidden'}
-        lg:right-4 lg:top-4
+        lg:top-4 lg:right-4
       `}
       >
         <div className="rounded-lg bg-gray-700 p-2">
@@ -369,8 +369,8 @@ export function IntensityMap() {
         </div>
       </div>
       <div className={`
-        absolute bottom-2 right-2 flex flex-col space-y-2
-        lg:bottom-4 lg:right-4
+        absolute right-2 bottom-2 flex flex-col space-y-2
+        lg:right-4 lg:bottom-4
       `}
       >
         <IntensityColors />
@@ -381,7 +381,7 @@ export function IntensityMap() {
           lg:bottom-4 lg:left-4
         `}
         >
-          <div className="rounded-lg bg-gray-700 bg-opacity-80 px-2 py-1">
+          <div className="bg-opacity-80 rounded-lg bg-gray-700 px-2 py-1">
             <span className="text-sm text-white">僅供參考，以中央氣象署發布之內容為準</span>
           </div>
         </div>

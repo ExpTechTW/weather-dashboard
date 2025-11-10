@@ -4,14 +4,16 @@ import dynamic from 'next/dynamic';
 import WeatherCard from '@/components/app/weather-header';
 // import BlurredMap from '@/components/blurred-map';
 // import WeatherMap from '@/components/map/local-alert';
-// import RadarMap from '@/components/map/radar';
+import RadarMap from '@/components/map/radar';
 // import TsunamiMap from '@/components/map/tsunami';
-import IntensityMap from '@/components/map/intensity';
+// import IntensityMap from '@/components/map/intensity';
+import { TyphoonMap } from '@/components/map/typhoon';
+
+const Clock = dynamic(() => import('@/components/app/clock'), {
+  ssr: false,
+});
 
 export function DashboardPanel() {
-  const Clock = dynamic(() => import('@/components/app/clock'), {
-    ssr: false,
-  });
   const [currentMapIndex, setCurrentMapIndex] = useState(0);
 
   const maps = [
@@ -20,13 +22,14 @@ export function DashboardPanel() {
     // <BlurredMap key="blurred" isBlurred={false}>
     //   <WeatherMap />
     // </BlurredMap>,
-    <IntensityMap key="intensity" />,
+    // <IntensityMap key="intensity" />,
+    <TyphoonMap key="typhoon" />,
   ];
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentMapIndex((prevIndex) => (prevIndex + 1) % maps.length);
-    }, 60000);
+    }, 30000);
 
     return () => clearInterval(interval);
   }, []);
