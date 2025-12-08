@@ -46,9 +46,10 @@ jobs:
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.HOST }}
-        username: yuyu1015
+        username: exptech
+        port: ${{ secrets.SSH_PORT }}
         password: ${{ secrets.PASSWORD }}
         script: |
-          cd /home/yuyu1015/weather-dashboard
+          cd /home/exptech/weather-dashboard-dev
           git pull
           docker compose up -d --build weather-dashboard-dev

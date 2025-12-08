@@ -2,25 +2,18 @@ import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 
 import WeatherCard from '@/components/app/weather-header';
-import WeatherAlerts from '@/components/weather-alert';
-import WeatherAlert from '@/modal/weather';
-import RadarMap from '@/components/map/radar';
-// import TsunamiMap from '@/components/map/tsunami';
 // import BlurredMap from '@/components/blurred-map';
 // import WeatherMap from '@/components/map/local-alert';
+import RadarMap from '@/components/map/radar';
+// import TsunamiMap from '@/components/map/tsunami';
+// import IntensityMap from '@/components/map/intensity';
+import { TyphoonMap } from '@/components/map/typhoon';
 
-interface DashboardPanelProps {
-  alerts: WeatherAlert[];
-  onAlertsChange: (alerts: WeatherAlert[]) => void;
-}
+const Clock = dynamic(() => import('@/components/app/clock'), {
+  ssr: false,
+});
 
-export function DashboardPanel({
-  alerts,
-  onAlertsChange,
-}: DashboardPanelProps) {
-  const Clock = dynamic(() => import('@/components/app/clock'), {
-    ssr: false,
-  });
+export function DashboardPanel() {
   const [currentMapIndex, setCurrentMapIndex] = useState(0);
 
   const maps = [
@@ -29,6 +22,8 @@ export function DashboardPanel({
     // <BlurredMap key="blurred" isBlurred={false}>
     //   <WeatherMap />
     // </BlurredMap>,
+    // <IntensityMap key="intensity" />,
+    <TyphoonMap key="typhoon" />,
   ];
 
   useEffect(() => {
@@ -50,10 +45,6 @@ export function DashboardPanel({
         <div className="flex flex-col gap-2">
           <Clock />
           <WeatherCard />
-        </div>
-
-        <div className="mt-auto">
-          <WeatherAlerts alerts={alerts} onAlertsChange={onAlertsChange} />
         </div>
       </div>
 

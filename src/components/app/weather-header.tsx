@@ -51,20 +51,9 @@ const WeatherCard: FC = () => {
 
         const station = (await response.json()) as WeatherData;
 
-        const data: WeatherData = {
-          weather: {
-            ...station.weather,
-            data: {
-              ...station.weather.data,
-              wind: {
-                ...station.weather.data.wind,
-                direction: (station.weather.data.wind.direction + 180) % 360,
-              },
-            },
-          },
-        };
+        station.weather.data.wind.direction = (station.weather.data.wind.direction + 180) % 360;
 
-        setWeatherData(data);
+        setWeatherData(station);
       }
       catch (error) {
         console.error('Error fetching weather:', error);
@@ -119,7 +108,7 @@ const WeatherCard: FC = () => {
             </span>
           </div>
           <div className="text-5xl font-extrabold">
-            {weatherData.weather.data.air.temperature.toFixed(1)}
+            {Number(weatherData.weather.data.air.temperature).toFixed(1)}
             °
           </div>
         </div>
@@ -142,7 +131,7 @@ const WeatherCard: FC = () => {
                 最高
               </div>
               <strong>
-                {weatherData.weather.daily.high.temperature.toFixed(1)}
+                {Number(weatherData.weather.daily.high.temperature).toFixed(1)}
                 °
               </strong>
             </div>
@@ -156,7 +145,7 @@ const WeatherCard: FC = () => {
                 最低
               </div>
               <span className="font-bold">
-                {weatherData.weather.daily.low.temperature.toFixed(1)}
+                {Number(weatherData.weather.daily.low.temperature).toFixed(1)}
                 °
               </span>
             </div>
@@ -173,7 +162,7 @@ const WeatherCard: FC = () => {
                 <span>濕度</span>
               </div>
               <strong>
-                {weatherData.weather.data.air.relative_humidity}
+                {Number(weatherData.weather.data.air.relative_humidity)}
                 %
               </strong>
             </div>
@@ -191,7 +180,7 @@ const WeatherCard: FC = () => {
                 <span>風速</span>
               </div>
               <strong>
-                {weatherData.weather.data.wind.speed.toFixed(1)}
+                {Number(weatherData.weather.data.wind.speed).toFixed(1)}
                 m/s
               </strong>
             </div>

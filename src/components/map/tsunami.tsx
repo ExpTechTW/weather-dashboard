@@ -124,8 +124,8 @@ function TsunamiMap() {
     <div className="relative h-full w-full">
       <BaseMap onMapLoaded={setupMap} />
       <div className={`
-        absolute left-2 top-2 flex flex-col space-y-2
-        lg:left-4 lg:top-4
+        absolute top-2 left-2 flex flex-col space-y-2
+        lg:top-4 lg:left-4
       `}
       >
         <div className={`
