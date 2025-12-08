@@ -47,6 +47,7 @@ jobs:
       with:
         host: ${{ secrets.HOST }}
         username: exptech
+        port: ${{ secrets.SSH_PORT }}
         password: ${{ secrets.PASSWORD }}
         script: |
           cd /home/exptech/weather-dashboard
