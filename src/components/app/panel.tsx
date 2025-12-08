@@ -29,7 +29,7 @@ export function DashboardPanel() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentMapIndex((prevIndex) => (prevIndex + 1) % maps.length);
-    }, 30000);
+    }, 60000);
 
     return () => clearInterval(interval);
   }, []);
