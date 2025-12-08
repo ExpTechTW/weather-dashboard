@@ -17,7 +17,7 @@ export function DashboardPanel() {
   const [currentMapIndex, setCurrentMapIndex] = useState(0);
 
   const maps = [
-    // <RadarMap key="radar" />,
+    <RadarMap key="radar" />,
     // <TsunamiMap key="tsunami" />,
     // <BlurredMap key="blurred" isBlurred={false}>
     //   <WeatherMap />
