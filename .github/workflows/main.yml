@@ -50,6 +50,6 @@ jobs:
         port: ${{ secrets.SSH_PORT }}
         password: ${{ secrets.PASSWORD }}
         script: |
-          cd /home/exptech/weather-dashboard
+          cd /home/exptech/weather-dashboard-dev
           git pull
           docker compose up -d --build weather-dashboard-dev
