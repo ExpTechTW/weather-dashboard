@@ -1,9 +1,13 @@
 'use client';
 
+import { Suspense } from 'react';
+
 import { DashboardPanel } from '@/components/app/panel';
 
 export default function DashboardPage() {
   return (
-    <DashboardPanel />
+    <Suspense>
+      <DashboardPanel />
+    </Suspense>
   );
 }
